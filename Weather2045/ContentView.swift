@@ -13,28 +13,24 @@ struct ContentView: View {
             )
             .ignoresSafeArea()
             
-            VStack(spacing: 0) {
-                if viewModel.isLoading {
-                    Spacer()
-                    ProgressView("Loading weather...")
+            if viewModel.isLoading {
+                ProgressView("Loading weather...")
+                    .foregroundStyle(.white)
+            } else if let error = viewModel.errorMessage {
+                VStack {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.system(size: 50))
+                        .foregroundStyle(.yellow)
+                    Text("Error")
+                        .font(.title)
                         .foregroundStyle(.white)
-                    Spacer()
-                } else if let error = viewModel.errorMessage {
-                    Spacer()
-                    VStack {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.system(size: 50))
-                            .foregroundStyle(.yellow)
-                        Text("Error")
-                            .font(.title)
-                            .foregroundStyle(.white)
-                        Text(error)
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.center)
-                            .padding()
-                    }
-                    Spacer()
-                } else if let weather = viewModel.weatherData {
+                    Text(error)
+                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                }
+            } else if let weather = viewModel.weatherData {
+                VStack(spacing: 0) {
                     ScrollView {
                         VStack(spacing: 25) {
                             // Date Header
@@ -43,12 +39,10 @@ struct ContentView: View {
                                     .font(.title2)
                                     .fontWeight(.semibold)
                                     .foregroundStyle(.primary)
-                                    .shadow(color: .white.opacity(0.8), radius: 2)
                                 
                                 Text(weather.locationName)
                                     .font(.title3)
                                     .foregroundStyle(.primary.opacity(0.9))
-                                    .shadow(color: .white.opacity(0.6), radius: 1)
                             }
                             .padding(.top, 20)
                             
@@ -71,24 +65,20 @@ struct ContentView: View {
                     }
                     
                     // Floating Toggle at Bottom
-                    VStack {
-                        Spacer()
-                        InterventionToggle(isEnabled: $viewModel.withInterventions)
-                            .padding()
-                            .background(.ultraThinMaterial)
-                    }
-                } else {
-                    Spacer()
-                    VStack {
-                        Image(systemName: "location.circle")
-                            .font(.system(size: 70))
-                            .foregroundStyle(.white)
-                        Text("Waiting for location...")
-                            .font(.title2)
-                            .foregroundStyle(.white)
-                            .padding()
-                    }
-                    Spacer()
+                    InterventionToggle(isEnabled: $viewModel.withInterventions)
+                        .padding()
+                        .background(.ultraThickMaterial)
+                        .shadow(color: .black.opacity(0.1), radius: 5)
+                }
+            } else {
+                VStack {
+                    Image(systemName: "location.circle")
+                        .font(.system(size: 70))
+                        .foregroundStyle(.white)
+                    Text("Waiting for location...")
+                        .font(.title2)
+                        .foregroundStyle(.white)
+                        .padding()
                 }
             }
         }
@@ -117,17 +107,14 @@ struct Main2045WeatherView: View {
             Image(systemName: weatherIcon(for: weather.projectedCondition))
                 .font(.system(size: 80))
                 .foregroundStyle(temperatureColor(for: weather.temperatureDelta))
-                .shadow(color: .white.opacity(0.8), radius: 3)
             
             Text(weather.displayProjectedTemp)
                 .font(.system(size: 72, weight: .bold))
                 .foregroundStyle(temperatureColor(for: weather.temperatureDelta))
-                .shadow(color: .white.opacity(0.8), radius: 2)
             
             Text(weather.projectedCondition)
                 .font(.title2)
                 .foregroundStyle(.primary)
-                .shadow(color: .white.opacity(0.8), radius: 1)
             
             // Climate indicators row
             HStack(spacing: 15) {
@@ -200,7 +187,6 @@ struct AdditionalClimateFactorsView: View {
             Text("Climate Impact Factors")
                 .font(.headline)
                 .foregroundStyle(.primary)
-                .shadow(color: .white.opacity(0.8), radius: 1)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
             VStack(spacing: 12) {
@@ -298,7 +284,6 @@ struct MethodologyView: View {
             Text("Methodology & Changes from Today")
                 .font(.headline)
                 .foregroundStyle(.primary)
-                .shadow(color: .white.opacity(0.8), radius: 1)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
             VStack(spacing: 12) {
@@ -443,7 +428,6 @@ struct ForecastView: View {
                     .font(.headline)
                     .foregroundStyle(.primary)
             }
-            .shadow(color: .white.opacity(0.8), radius: 1)
             .frame(maxWidth: .infinity, alignment: .leading)
             
             Text(forecast)
@@ -451,7 +435,6 @@ struct ForecastView: View {
                 .foregroundStyle(.primary)
                 .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
-                .shadow(color: .white.opacity(0.5), radius: 1)
         }
         .padding()
         .background(.ultraThinMaterial)
@@ -468,7 +451,6 @@ struct InterventionToggle: View {
                 .font(.title3)
                 .fontWeight(.semibold)
                 .foregroundStyle(.primary)
-                .shadow(color: .white.opacity(0.8), radius: 1)
             
             HStack(spacing: 15) {
                 Text("Without")

@@ -147,58 +147,45 @@ struct ClimateProjection {
         currentWindSpeed: Double,
         withInterventions: Bool
     ) -> String {
-        var forecast = "By 2045, \(locationName) will experience "
+        var forecast = ""
         
-        // Temperature impact description with specific warming threshold context
-        if temperatureDelta < 1.0 {
-            forecast += "modest warming (\(String(format: "%+.1f°C", temperatureDelta))), staying well below critical thresholds. "
-        } else if temperatureDelta < 1.5 {
-            forecast += "moderate warming (\(String(format: "%+.1f°C", temperatureDelta))), approaching the 1.5°C Paris Agreement target. "
-        } else if temperatureDelta < 2.5 {
-            forecast += "significant warming (\(String(format: "%+.1f°C", temperatureDelta))), exceeding the 1.5°C threshold with notable climate impacts. "
+        // Temperature and conditions
+        let tempCelsius = Int(projectedTemp.rounded())
+        forecast += "\(projectedCondition) with a high of \(tempCelsius)°C. "
+        
+        // Humidity
+        if projectedHumidity > 75 {
+            forecast += "Humid conditions with \(projectedHumidity)% humidity. "
+        } else if projectedHumidity < 30 {
+            forecast += "Dry air with \(projectedHumidity)% humidity. "
+        }
+        
+        // Wind
+        let windKmh = Int((projectedWindSpeed * 3.6).rounded()) // Convert m/s to km/h
+        if windKmh > 30 {
+            forecast += "Windy, with gusts up to \(windKmh) km/h. "
+        } else if windKmh > 15 {
+            forecast += "Breezy, winds around \(windKmh) km/h. "
         } else {
-            forecast += "severe warming (\(String(format: "%+.1f°C", temperatureDelta))), far beyond safe climate limits. "
+            forecast += "Light winds around \(windKmh) km/h. "
         }
         
-        // Climate-related factors based on synthesized data
-        var climateImpacts: [String] = []
-        
-        // Humidity impacts
-        if projectedHumidity > 80 {
-            climateImpacts.append("elevated humidity (\(projectedHumidity)%) making heat feel more oppressive")
-        } else if projectedHumidity > 70 {
-            climateImpacts.append("increased humidity (\(projectedHumidity)%)")
+        // Weather-specific details
+        if projectedCondition.contains("Rain") || projectedCondition.contains("Stormy") {
+            forecast += "Expect periods of rainfall throughout the day. "
+        } else if projectedCondition.contains("Hot") || tempCelsius > 30 {
+            forecast += "Hot conditions persist, stay hydrated. "
+        } else if projectedCondition.contains("Clear") {
+            forecast += "Enjoy the clear skies. "
         }
         
-        // Wind pattern changes
-        let windIncrease = ((projectedWindSpeed - currentWindSpeed) / max(currentWindSpeed, 0.1)) * 100
-        if windIncrease > 20 {
-            climateImpacts.append("stronger winds (up to \(String(format: "%.1f", projectedWindSpeed)) m/s)")
-        } else if windIncrease > 10 {
-            climateImpacts.append("intensified wind patterns")
-        }
-        
-        // Weather pattern intensification based on projected conditions
-        if projectedCondition.contains("Heavy") || projectedCondition.contains("Stormy") {
-            climateImpacts.append("more intense precipitation events")
-        } else if projectedCondition.contains("Hot") {
-            climateImpacts.append("increased heat wave frequency")
-        }
-        
-        if !climateImpacts.isEmpty {
-            forecast += "Expect " + climateImpacts.joined(separator: ", ") + ". "
-        }
-        
-        // Broader climate context
-        if temperatureDelta > 1.5 {
-            forecast += "These changes reflect the amplification of extreme weather patterns due to climate change. "
-        }
-        
-        // Intervention impact with specific context
-        if withInterventions {
-            forecast += "Climate interventions like solar radiation management are projected to reduce warming by approximately 1.2°C, helping mitigate the most severe impacts."
+        // Evening outlook
+        if tempCelsius > 25 {
+            forecast += "Warm evening ahead with temperatures remaining elevated."
+        } else if tempCelsius < 10 {
+            forecast += "Cool evening expected, dress warmly."
         } else {
-            forecast += "Without interventions, the region faces the full trajectory of climate impacts with potential for further deterioration."
+            forecast += "Pleasant evening temperatures expected."
         }
         
         return forecast
