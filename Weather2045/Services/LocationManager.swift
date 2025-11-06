@@ -22,6 +22,8 @@ class LocationManager: NSObject, ObservableObject {
 extension LocationManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
+        // CLLocationManagerDelegate callbacks may not be on the main thread
+        // Dispatch to main to ensure thread-safe updates to @Published properties
         DispatchQueue.main.async {
             self.location = location
         }

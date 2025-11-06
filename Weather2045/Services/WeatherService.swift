@@ -2,7 +2,9 @@ import Foundation
 import CoreLocation
 
 class WeatherService {
-    // OpenWeatherMap API key constant - replace with your actual key
+    // OpenWeatherMap API key constant - Replace with your actual key from https://openweathermap.org/api
+    // Note: In production apps, use secure storage like Xcode build settings or a configuration file
+    // For this demo app, a constant is acceptable as per the project requirements
     private let apiKey = "YOUR_OPENWEATHERMAP_API_KEY"
     private let baseURL = "https://api.openweathermap.org/data/2.5/weather"
     
