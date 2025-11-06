@@ -2,23 +2,24 @@ import Foundation
 import CoreLocation
 
 class WeatherService {
-    // OpenWeatherMap API key constant - Replace with your actual key from https://openweathermap.org/api
+    // OpenWeatherMap application programming interface key constant
+    // Replace with your actual key from https://openweathermap.org/api
     // Note: In production apps, use secure storage like Xcode build settings or a configuration file
     // For this demo app, a constant is acceptable as per the project requirements
-    private let apiKey = "YOUR_OPENWEATHERMAP_API_KEY"
-    private let baseURL = "https://api.openweathermap.org/data/2.5/weather"
+    private let applicationProgrammingInterfaceKey = "YOUR_OPENWEATHERMAP_API_KEY"
+    private let baseUniformResourceLocator = "https://api.openweathermap.org/data/2.5/weather"
     
     func fetchWeather(latitude: Double, longitude: Double) async throws -> WeatherResponse {
-        let urlString = "\(baseURL)?lat=\(latitude)&lon=\(longitude)&appid=\(apiKey)&units=imperial"
+        let uniformResourceLocatorString = "\(baseUniformResourceLocator)?lat=\(latitude)&lon=\(longitude)&appid=\(applicationProgrammingInterfaceKey)&units=imperial"
         
-        guard let url = URL(string: urlString) else {
-            throw WeatherError.invalidURL
+        guard let uniformResourceLocator = URL(string: uniformResourceLocatorString) else {
+            throw WeatherError.invalidUniformResourceLocator
         }
         
-        let (data, response) = try await URLSession.shared.data(from: url)
+        let (data, response) = try await URLSession.shared.data(from: uniformResourceLocator)
         
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 200 else {
+        guard let hyperTextTransferProtocolResponse = response as? HTTPURLResponse,
+              hyperTextTransferProtocolResponse.statusCode == 200 else {
             throw WeatherError.invalidResponse
         }
         
@@ -32,14 +33,14 @@ class WeatherService {
 }
 
 enum WeatherError: Error, LocalizedError {
-    case invalidURL
+    case invalidUniformResourceLocator
     case invalidResponse
     case decodingError
     
     var errorDescription: String? {
         switch self {
-        case .invalidURL:
-            return "Invalid URL"
+        case .invalidUniformResourceLocator:
+            return "Invalid Uniform Resource Locator"
         case .invalidResponse:
             return "Invalid server response"
         case .decodingError:

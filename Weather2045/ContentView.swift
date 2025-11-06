@@ -180,7 +180,7 @@ struct InterventionToggle: View {
                     .foregroundStyle(.white.opacity(0.7))
             }
             
-            Text(isEnabled ? "Includes SRM & other interventions" : "Current trajectory")
+            Text(isEnabled ? "Includes Solar Radiation Management & other interventions" : "Current trajectory")
                 .font(.caption)
                 .foregroundStyle(.white.opacity(0.6))
         }

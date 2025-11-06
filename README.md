@@ -6,7 +6,7 @@ A lightweight SwiftUI iOS app that shows synthesized 2045 weather projections ba
 
 - **Current Weather**: Displays current temperature and conditions using your location
 - **2045 Projections**: Shows projected weather for 2045 based on climate models
-- **Climate Interventions Toggle**: Compare scenarios with/without interventions (SRM, etc.)
+- **Climate Interventions Toggle**: Compare scenarios with/without interventions (Solar Radiation Management, etc.)
 - **Beautiful UI**: Clean SwiftUI interface with SF Symbols for weather conditions
 - **Location-based**: Uses Core Location to get weather for your current location
 
@@ -14,14 +14,14 @@ A lightweight SwiftUI iOS app that shows synthesized 2045 weather projections ba
 
 - iOS 18.0+
 - Xcode 15.0+
-- OpenWeatherMap API key
+- OpenWeatherMap application programming interface key
 
 ## Setup
 
 1. Clone this repository
 2. Open `Weather2045.xcodeproj` in Xcode
-3. Get a free API key from [OpenWeatherMap](https://openweathermap.org/api)
-4. Replace `YOUR_OPENWEATHERMAP_API_KEY` in `Weather2045/Services/WeatherService.swift` with your API key
+3. Get a free application programming interface key from [OpenWeatherMap](https://openweathermap.org/api)
+4. Replace `YOUR_OPENWEATHERMAP_API_KEY` in `Weather2045/Services/WeatherService.swift` with your key
 5. Build and run the app on a simulator or device
 
 ## Architecture
@@ -29,7 +29,7 @@ A lightweight SwiftUI iOS app that shows synthesized 2045 weather projections ba
 The app follows a clean architecture with:
 
 - **Models**: Data structures for weather and climate projections
-- **Services**: Location management and weather API integration
+- **Services**: Location management and weather application programming interface integration
 - **ViewModel**: Business logic and state management
 - **Views**: SwiftUI views for the user interface
 
@@ -40,10 +40,23 @@ No singletons are used; dependencies are managed through SwiftUI's `@StateObject
 The app uses simplified climate projection models to estimate 2045 weather:
 
 - **Baseline warming**: ~2.5°C increase by 2045 under current trajectory
-- **With interventions**: Includes cooling effects from Solar Radiation Management (SRM) and other climate interventions (~1.2°C reduction)
+- **With interventions**: Includes cooling effects from Solar Radiation Management and other climate interventions (~1.2°C reduction)
 - **Regional variation**: Accounts for regional climate variation factors
 
 *Note: These are simplified estimates for demonstration purposes. Actual climate science involves much more complex models.*
+
+## Testing
+
+Weather 2045 includes comprehensive unit tests. See [TESTING.md](TESTING.md) for details.
+
+Run tests in Xcode:
+```bash
+⌘U or Product → Test
+```
+
+## Deployment
+
+The app is configured for Xcode Cloud continuous integration. See `.xcode-cloud/ci_workflow.yml` for configuration.
 
 ## License
 

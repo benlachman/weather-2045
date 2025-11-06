@@ -6,7 +6,7 @@ struct ClimateProjection {
     
     private static let baselineWarmingDelta: Double = 2.5 // °C by 2045 under current trajectory
     
-    // Solar Radiation Management (SRM) and other intervention effects
+    // Solar Radiation Management and other intervention effects
     private static let interventionCoolingEffect: Double = 1.2 // °C reduction
     
     // Regional variation factors (simplified)
