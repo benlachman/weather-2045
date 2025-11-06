@@ -6,8 +6,12 @@ A lightweight SwiftUI iOS app that shows synthesized 2045 weather projections ba
 
 - **Current Weather**: Displays current temperature and conditions using your location
 - **2045 Projections**: Shows projected weather for 2045 based on climate models
+- **Climate Impact Indicators**: View projected changes in humidity, wind speed, and precipitation
+- **Natural Language Forecast**: Readable climate forecast based on synthesized 2045 data
+- **Color-Coded Temperatures**: Visual indicators showing warming severity relative to 1.5°C Paris Agreement threshold
 - **Climate Interventions Toggle**: Compare scenarios with/without interventions (Solar Radiation Management, etc.)
-- **Beautiful UI**: Clean SwiftUI interface with SF Symbols for weather conditions
+- **Metric Units**: All measurements in SI units (Celsius, m/s, mm)
+- **Beautiful UI**: Clean SwiftUI interface with improved readability and SF Symbols for weather conditions
 - **Location-based**: Uses Core Location to get weather for your current location
 
 ## Requirements
@@ -39,9 +43,23 @@ No singletons are used; dependencies are managed through SwiftUI's `@StateObject
 
 The app uses simplified climate projection models to estimate 2045 weather:
 
-- **Baseline warming**: ~2.5°C increase by 2045 under current trajectory
+- **Baseline warming**: ~2.5°C increase by 2045 under current trajectory (with 0.8 regional variation factor)
 - **With interventions**: Includes cooling effects from Solar Radiation Management and other climate interventions (~1.2°C reduction)
 - **Regional variation**: Accounts for regional climate variation factors
+- **1.5°C Threshold**: Color-coded temperature displays reflect the Paris Agreement 1.5°C warming target
+  - Green: Below 1.5°C warming
+  - Yellow: 1.5°C - 2.0°C warming
+  - Orange: 2.0°C - 2.5°C warming
+  - Red: Above 2.5°C warming
+
+### Climate Indicators
+
+The app projects multiple climate-related factors:
+
+- **Humidity**: Increases with temperature (~2.5% per °C)
+- **Wind Speed**: Intensifies with warming (~15% per °C)
+- **Precipitation**: More intense events with warming (~20% per °C)
+- **Weather Conditions**: Patterns intensify above 1.5°C threshold
 
 *Note: These are simplified estimates for demonstration purposes. Actual climate science involves much more complex models.*
 
