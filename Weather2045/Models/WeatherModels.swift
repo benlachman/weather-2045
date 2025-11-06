@@ -110,6 +110,26 @@ struct Weather2045Data {
         String(format: "%.1f mm", projectedPrecipitation)
     }
     
+    var humidityDelta: Int {
+        projectedHumidity - humidity
+    }
+    
+    var windSpeedDelta: Double {
+        projectedWindSpeed - windSpeed
+    }
+    
+    var precipitationDelta: Double {
+        projectedPrecipitation - precipitation
+    }
+    
+    var displayHumidityDelta: String {
+        "+\(humidityDelta)%"
+    }
+    
+    var displayWindSpeedDelta: String {
+        String(format: "+%.1f m/s", windSpeedDelta)
+    }
+    
     var todayDate2045: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "EEEE, MMMM d"

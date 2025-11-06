@@ -303,8 +303,8 @@ struct MethodologyView: View {
             
             VStack(spacing: 12) {
                 ChangeRow(label: "Temperature", from: weather.displayCurrentTemp, to: weather.displayProjectedTemp, delta: weather.displayDelta)
-                ChangeRow(label: "Humidity", from: weather.displayHumidity, to: weather.displayProjectedHumidity, delta: "+\(weather.projectedHumidity - weather.humidity)%")
-                ChangeRow(label: "Wind Speed", from: weather.displayWindSpeed, to: weather.displayProjectedWindSpeed, delta: String(format: "+%.1f m/s", weather.projectedWindSpeed - weather.windSpeed))
+                ChangeRow(label: "Humidity", from: weather.displayHumidity, to: weather.displayProjectedHumidity, delta: weather.displayHumidityDelta)
+                ChangeRow(label: "Wind Speed", from: weather.displayWindSpeed, to: weather.displayProjectedWindSpeed, delta: weather.displayWindSpeedDelta)
             }
             
             Divider()

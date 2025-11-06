@@ -379,7 +379,15 @@ final class ClimateProjectionTests: XCTestCase {
         
         // Baseline should be lower risk than increased
         let riskLevels = ["Low": 0, "Moderate": 1, "High": 2, "Severe": 3]
-        XCTAssertLessThanOrEqual(riskLevels[baseline] ?? 0, riskLevels[increased] ?? 0,
-                                 "Risk should escalate with increasing climate factors")
+        let baselineLevel = riskLevels[baseline]
+        let increasedLevel = riskLevels[increased]
+        
+        XCTAssertNotNil(baselineLevel, "Baseline risk should be a valid risk level")
+        XCTAssertNotNil(increasedLevel, "Increased risk should be a valid risk level")
+        
+        if let baselineValue = baselineLevel, let increasedValue = increasedLevel {
+            XCTAssertLessThanOrEqual(baselineValue, increasedValue,
+                                     "Risk should escalate with increasing climate factors")
+        }
     }
 }

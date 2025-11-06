@@ -12,6 +12,10 @@ struct ClimateProjection {
     // Regional variation factors (simplified)
     private static let regionalVariation: Double = 0.8
     
+    // Water availability constants
+    private static let minWaterAvailability: Int = 25
+    private static let maxWaterAvailability: Int = 100
+    
     static func project2045Temperature(currentTemp: Double, withInterventions: Bool) -> Double {
         let warmingDelta = baselineWarmingDelta * regionalVariation
         let interventionDelta = withInterventions ? interventionCoolingEffect : 0.0
@@ -62,8 +66,8 @@ struct ClimateProjection {
     
     static func projectWaterAvailability(currentHumidity: Int, temperatureDelta: Double, precipitation: Double) -> Int {
         // Water availability decreases with warming due to increased evaporation and changing precipitation patterns
-        // Base availability starts at 100%
-        var availability = 100
+        // Base availability starts at maxWaterAvailability
+        var availability = maxWaterAvailability
         
         // Reduce by warming impact (more evaporation)
         availability -= Int(temperatureDelta * 8) // ~8% reduction per degree
@@ -80,7 +84,7 @@ struct ClimateProjection {
             availability -= 10 // Low precipitation penalty
         }
         
-        return max(25, min(100, availability)) // Keep between 25-100%
+        return max(minWaterAvailability, min(maxWaterAvailability, availability))
     }
     
     static func projectGardeningImpact(temperatureDelta: Double, projectedTemp: Double, precipitation: Double) -> String {
