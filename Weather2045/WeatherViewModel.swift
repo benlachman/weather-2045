@@ -68,6 +68,24 @@ class WeatherViewModel: ObservableObject {
                 withInterventions: withInterventions
             )
             
+            let waterAvailability = ClimateProjection.projectWaterAvailability(
+                currentHumidity: humidity,
+                temperatureDelta: delta,
+                precipitation: precipitation
+            )
+            
+            let gardeningImpact = ClimateProjection.projectGardeningImpact(
+                temperatureDelta: delta,
+                projectedTemp: projectedTemp,
+                precipitation: projectedPrecipitation
+            )
+            
+            let disasterRisk = ClimateProjection.projectDisasterRisk(
+                temperatureDelta: delta,
+                windSpeed: projectedWindSpeed,
+                precipitation: projectedPrecipitation
+            )
+            
             weatherData = Weather2045Data(
                 currentTemp: currentTemp,
                 projectedTemp: projectedTemp,
@@ -82,7 +100,10 @@ class WeatherViewModel: ObservableObject {
                 projectedWindSpeed: projectedWindSpeed,
                 precipitation: precipitation,
                 projectedPrecipitation: projectedPrecipitation,
-                forecast: forecast
+                forecast: forecast,
+                waterAvailability: waterAvailability,
+                gardeningImpact: gardeningImpact,
+                disasterRisk: disasterRisk
             )
         } catch {
             errorMessage = error.localizedDescription
@@ -131,6 +152,24 @@ class WeatherViewModel: ObservableObject {
             withInterventions: withInterventions
         )
         
+        let waterAvailability = ClimateProjection.projectWaterAvailability(
+            currentHumidity: current.humidity,
+            temperatureDelta: delta,
+            precipitation: current.precipitation
+        )
+        
+        let gardeningImpact = ClimateProjection.projectGardeningImpact(
+            temperatureDelta: delta,
+            projectedTemp: projectedTemp,
+            precipitation: projectedPrecipitation
+        )
+        
+        let disasterRisk = ClimateProjection.projectDisasterRisk(
+            temperatureDelta: delta,
+            windSpeed: projectedWindSpeed,
+            precipitation: projectedPrecipitation
+        )
+        
         weatherData = Weather2045Data(
             currentTemp: current.currentTemp,
             projectedTemp: projectedTemp,
@@ -145,7 +184,10 @@ class WeatherViewModel: ObservableObject {
             projectedWindSpeed: projectedWindSpeed,
             precipitation: current.precipitation,
             projectedPrecipitation: projectedPrecipitation,
-            forecast: forecast
+            forecast: forecast,
+            waterAvailability: waterAvailability,
+            gardeningImpact: gardeningImpact,
+            disasterRisk: disasterRisk
         )
     }
 }

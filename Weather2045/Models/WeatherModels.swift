@@ -69,6 +69,11 @@ struct Weather2045Data {
     let projectedPrecipitation: Double
     let forecast: String
     
+    // New climate factors
+    let waterAvailability: Int // Percentage (0-100)
+    let gardeningImpact: String // Description of impact
+    let disasterRisk: String // Low, Moderate, High, Severe
+    
     var displayCurrentTemp: String {
         String(format: "%.1f°C", currentTemp)
     }
@@ -103,5 +108,17 @@ struct Weather2045Data {
     
     var displayProjectedPrecipitation: String {
         String(format: "%.1f mm", projectedPrecipitation)
+    }
+    
+    var todayDate2045: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, MMMM d"
+        let now = Date()
+        let calendar = Calendar.current
+        // Project to 2045 - same month/day, year 2045
+        if let year2045 = calendar.date(bySetting: .year, value: 2045, of: now) {
+            return formatter.string(from: year2045)
+        }
+        return "2045"
     }
 }

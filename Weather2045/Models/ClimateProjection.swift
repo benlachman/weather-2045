@@ -60,6 +60,79 @@ struct ClimateProjection {
         return currentPrecipitation * (1.0 + precipitationIncrease)
     }
     
+    static func projectWaterAvailability(currentHumidity: Int, temperatureDelta: Double, precipitation: Double) -> Int {
+        // Water availability decreases with warming due to increased evaporation and changing precipitation patterns
+        // Base availability starts at 100%
+        var availability = 100
+        
+        // Reduce by warming impact (more evaporation)
+        availability -= Int(temperatureDelta * 8) // ~8% reduction per degree
+        
+        // Adjust for humidity (higher humidity = better water retention)
+        if currentHumidity < 40 {
+            availability -= 15 // Dry climate penalty
+        } else if currentHumidity > 70 {
+            availability += 5 // Humid climate bonus
+        }
+        
+        // Adjust for precipitation
+        if precipitation < 1.0 {
+            availability -= 10 // Low precipitation penalty
+        }
+        
+        return max(25, min(100, availability)) // Keep between 25-100%
+    }
+    
+    static func projectGardeningImpact(temperatureDelta: Double, projectedTemp: Double, precipitation: Double) -> String {
+        if temperatureDelta < 1.0 {
+            return "Minimal changes to growing season"
+        } else if temperatureDelta < 1.5 {
+            return "Extended growing season, some heat-sensitive crops stressed"
+        } else if temperatureDelta < 2.5 {
+            return "Significantly altered growing zones, traditional crops may struggle"
+        } else {
+            return "Major disruption to agriculture, heat-tolerant crops required"
+        }
+    }
+    
+    static func projectDisasterRisk(temperatureDelta: Double, windSpeed: Double, precipitation: Double) -> String {
+        var riskScore = 0
+        
+        // Temperature contribution
+        if temperatureDelta > 2.5 {
+            riskScore += 3
+        } else if temperatureDelta > 1.5 {
+            riskScore += 2
+        } else if temperatureDelta > 1.0 {
+            riskScore += 1
+        }
+        
+        // Wind contribution
+        if windSpeed > 15 {
+            riskScore += 2
+        } else if windSpeed > 10 {
+            riskScore += 1
+        }
+        
+        // Precipitation contribution (both extremes are risky)
+        if precipitation > 50 || precipitation < 0.5 {
+            riskScore += 2
+        } else if precipitation > 20 || precipitation < 2 {
+            riskScore += 1
+        }
+        
+        switch riskScore {
+        case 0...1:
+            return "Low"
+        case 2...3:
+            return "Moderate"
+        case 4...5:
+            return "High"
+        default:
+            return "Severe"
+        }
+    }
+    
     static func generateForecast(
         locationName: String,
         temperatureDelta: Double,
