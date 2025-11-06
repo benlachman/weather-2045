@@ -1,0 +1,16 @@
+version: 1.0
+workflows:
+  main-workflow:
+    name: Main Workflow
+    description: Build and test Weather 2045 app
+    environment:
+      ios: 18.0
+      xcode: 15.0
+    archive:
+      scheme: Weather2045
+    test:
+      scheme: Weather2045
+      destinations:
+        - platform: iOS Simulator
+          device: iPhone 15 Pro
+          os: 18.0
