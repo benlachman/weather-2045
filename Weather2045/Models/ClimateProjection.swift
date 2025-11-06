@@ -65,35 +65,63 @@ struct ClimateProjection {
         temperatureDelta: Double,
         projectedTemp: Double,
         projectedCondition: String,
+        projectedHumidity: Int,
+        projectedWindSpeed: Double,
+        currentWindSpeed: Double,
         withInterventions: Bool
     ) -> String {
-        var forecast = "By 2045, \(locationName) is projected to be "
+        var forecast = "By 2045, \(locationName) will experience "
         
-        // Temperature impact description
+        // Temperature impact description with specific warming threshold context
         if temperatureDelta < 1.0 {
-            forecast += "slightly warmer"
+            forecast += "modest warming (\(String(format: "%+.1f°C", temperatureDelta))), staying well below critical thresholds. "
         } else if temperatureDelta < 1.5 {
-            forecast += "moderately warmer"
+            forecast += "moderate warming (\(String(format: "%+.1f°C", temperatureDelta))), approaching the 1.5°C Paris Agreement target. "
         } else if temperatureDelta < 2.5 {
-            forecast += "significantly warmer"
+            forecast += "significant warming (\(String(format: "%+.1f°C", temperatureDelta))), exceeding the 1.5°C threshold with notable climate impacts. "
         } else {
-            forecast += "much hotter"
+            forecast += "severe warming (\(String(format: "%+.1f°C", temperatureDelta))), far beyond safe climate limits. "
         }
         
-        forecast += " (\(String(format: "%+.1f°C", temperatureDelta))). "
+        // Climate-related factors based on synthesized data
+        var climateImpacts: [String] = []
         
-        // Weather pattern changes
+        // Humidity impacts
+        if projectedHumidity > 80 {
+            climateImpacts.append("elevated humidity (\(projectedHumidity)%) making heat feel more oppressive")
+        } else if projectedHumidity > 70 {
+            climateImpacts.append("increased humidity (\(projectedHumidity)%)")
+        }
+        
+        // Wind pattern changes
+        let windIncrease = ((projectedWindSpeed - currentWindSpeed) / max(currentWindSpeed, 0.1)) * 100
+        if windIncrease > 20 {
+            climateImpacts.append("stronger winds (up to \(String(format: "%.1f", projectedWindSpeed)) m/s)")
+        } else if windIncrease > 10 {
+            climateImpacts.append("intensified wind patterns")
+        }
+        
+        // Weather pattern intensification based on projected conditions
+        if projectedCondition.contains("Heavy") || projectedCondition.contains("Stormy") {
+            climateImpacts.append("more intense precipitation events")
+        } else if projectedCondition.contains("Hot") {
+            climateImpacts.append("increased heat wave frequency")
+        }
+        
+        if !climateImpacts.isEmpty {
+            forecast += "Expect " + climateImpacts.joined(separator: ", ") + ". "
+        }
+        
+        // Broader climate context
         if temperatureDelta > 1.5 {
-            forecast += "Expect more extreme weather events including intense storms and heat waves. "
-        } else {
-            forecast += "Weather patterns will shift with increased variability. "
+            forecast += "These changes reflect the amplification of extreme weather patterns due to climate change. "
         }
         
-        // Intervention impact
+        // Intervention impact with specific context
         if withInterventions {
-            forecast += "Climate interventions help reduce the worst impacts."
+            forecast += "Climate interventions like solar radiation management are projected to reduce warming by approximately 1.2°C, helping mitigate the most severe impacts."
         } else {
-            forecast += "Without intervention, impacts could worsen further."
+            forecast += "Without interventions, the region faces the full trajectory of climate impacts with potential for further deterioration."
         }
         
         return forecast

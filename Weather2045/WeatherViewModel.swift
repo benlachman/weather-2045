@@ -62,6 +62,9 @@ class WeatherViewModel: ObservableObject {
                 temperatureDelta: delta,
                 projectedTemp: projectedTemp,
                 projectedCondition: projectedCondition,
+                projectedHumidity: projectedHumidity,
+                projectedWindSpeed: projectedWindSpeed,
+                currentWindSpeed: windSpeed,
                 withInterventions: withInterventions
             )
             
@@ -122,6 +125,9 @@ class WeatherViewModel: ObservableObject {
             temperatureDelta: delta,
             projectedTemp: projectedTemp,
             projectedCondition: projectedCondition,
+            projectedHumidity: projectedHumidity,
+            projectedWindSpeed: projectedWindSpeed,
+            currentWindSpeed: current.windSpeed,
             withInterventions: withInterventions
         )
         
