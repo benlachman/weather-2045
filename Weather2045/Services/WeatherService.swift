@@ -10,7 +10,7 @@ class WeatherService {
     private let baseUniformResourceLocator = "https://api.openweathermap.org/data/2.5/weather"
     
     func fetchWeather(latitude: Double, longitude: Double) async throws -> WeatherResponse {
-        let uniformResourceLocatorString = "\(baseUniformResourceLocator)?lat=\(latitude)&lon=\(longitude)&appid=\(applicationProgrammingInterfaceKey)&units=imperial"
+        let uniformResourceLocatorString = "\(baseUniformResourceLocator)?lat=\(latitude)&lon=\(longitude)&appid=\(applicationProgrammingInterfaceKey)&units=metric"
         
         guard let uniformResourceLocator = URL(string: uniformResourceLocatorString) else {
             throw WeatherError.invalidUniformResourceLocator

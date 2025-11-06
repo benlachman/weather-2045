@@ -32,11 +32,15 @@ struct ContentView: View {
                                 .padding()
                         }
                     } else if let weather = viewModel.weatherData {
-                        WeatherDisplayView(weather: weather)
-                        
-                        Spacer()
-                        
-                        InterventionToggle(isEnabled: $viewModel.withInterventions)
+                        ScrollView {
+                            VStack(spacing: 20) {
+                                WeatherDisplayView(weather: weather)
+                                ClimateConditionsView(weather: weather)
+                                ForecastView(forecast: weather.forecast)
+                                InterventionToggle(isEnabled: $viewModel.withInterventions)
+                            }
+                            .padding()
+                        }
                     } else {
                         VStack {
                             Image(systemName: "location.circle")
@@ -49,7 +53,6 @@ struct ContentView: View {
                         }
                     }
                 }
-                .padding()
             }
             .navigationTitle("Weather 2045")
             .navigationBarTitleDisplayMode(.inline)
@@ -80,58 +83,69 @@ struct WeatherDisplayView: View {
             Text(weather.locationName)
                 .font(.largeTitle)
                 .fontWeight(.bold)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
+                .shadow(color: .white.opacity(0.8), radius: 2)
             
             HStack(spacing: 50) {
                 VStack(spacing: 15) {
                     Text("Today")
                         .font(.headline)
-                        .foregroundStyle(.white.opacity(0.8))
+                        .foregroundStyle(.primary)
+                        .shadow(color: .white.opacity(0.8), radius: 1)
                     
                     Image(systemName: weatherIcon(for: weather.currentCondition))
                         .font(.system(size: 50))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
+                        .shadow(color: .white.opacity(0.8), radius: 2)
                     
                     Text(weather.displayCurrentTemp)
                         .font(.system(size: 60, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
+                        .shadow(color: .white.opacity(0.8), radius: 2)
                     
                     Text(weather.currentCondition)
                         .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.9))
+                        .foregroundStyle(.primary)
+                        .shadow(color: .white.opacity(0.8), radius: 1)
                 }
                 
                 Image(systemName: "arrow.right")
                     .font(.system(size: 30))
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.primary.opacity(0.6))
                 
                 VStack(spacing: 15) {
                     Text("2045")
                         .font(.headline)
-                        .foregroundStyle(.white.opacity(0.8))
+                        .foregroundStyle(.primary)
+                        .shadow(color: .white.opacity(0.8), radius: 1)
                     
                     Image(systemName: weatherIcon(for: weather.projectedCondition))
                         .font(.system(size: 50))
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(temperatureColor(for: weather.temperatureDelta))
+                        .shadow(color: .white.opacity(0.8), radius: 2)
                     
                     Text(weather.displayProjectedTemp)
                         .font(.system(size: 60, weight: .bold))
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(temperatureColor(for: weather.temperatureDelta))
+                        .shadow(color: .white.opacity(0.8), radius: 2)
                     
                     Text(weather.projectedCondition)
                         .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.9))
+                        .foregroundStyle(.primary)
+                        .shadow(color: .white.opacity(0.8), radius: 1)
                 }
             }
             
             VStack(spacing: 5) {
                 Text("Temperature Change")
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(.secondary)
+                    .shadow(color: .white.opacity(0.5), radius: 1)
                 Text(weather.displayDelta)
                     .font(.title2)
                     .fontWeight(.semibold)
-                    .foregroundStyle(weather.temperatureDelta > 0 ? .orange : .white)
+                    .foregroundStyle(temperatureColor(for: weather.temperatureDelta))
+                    .shadow(color: .white.opacity(0.8), radius: 1)
             }
             .padding()
             .background(.ultraThinMaterial)
@@ -157,6 +171,136 @@ struct WeatherDisplayView: View {
             return "cloud.sun.fill"
         }
     }
+    
+    private func temperatureColor(for delta: Double) -> Color {
+        if delta < 1.5 {
+            return .green
+        } else if delta < 2.0 {
+            return .yellow
+        } else if delta < 2.5 {
+            return .orange
+        } else {
+            return .red
+        }
+    }
+}
+
+struct ClimateConditionsView: View {
+    let weather: Weather2045Data
+    
+    var body: some View {
+        VStack(spacing: 15) {
+            Text("Climate Impact Indicators")
+                .font(.headline)
+                .foregroundStyle(.primary)
+                .shadow(color: .white.opacity(0.8), radius: 1)
+            
+            HStack(spacing: 20) {
+                VStack(spacing: 10) {
+                    ClimateIndicator(
+                        icon: "humidity.fill",
+                        label: "Humidity",
+                        currentValue: weather.displayHumidity,
+                        projectedValue: weather.displayProjectedHumidity
+                    )
+                    
+                    ClimateIndicator(
+                        icon: "wind",
+                        label: "Wind",
+                        currentValue: weather.displayWindSpeed,
+                        projectedValue: weather.displayProjectedWindSpeed
+                    )
+                }
+                
+                if weather.precipitation > 0 || weather.projectedPrecipitation > 0 {
+                    ClimateIndicator(
+                        icon: "cloud.rain.fill",
+                        label: "Precipitation",
+                        currentValue: weather.displayPrecipitation,
+                        projectedValue: weather.displayProjectedPrecipitation
+                    )
+                }
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 15))
+    }
+}
+
+struct ClimateIndicator: View {
+    let icon: String
+    let label: String
+    let currentValue: String
+    let projectedValue: String
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundStyle(.primary)
+            
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            
+            HStack(spacing: 5) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Now")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    Text(currentValue)
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                }
+                
+                Image(systemName: "arrow.right")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("2045")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    Text(projectedValue)
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.orange)
+                }
+            }
+        }
+        .padding(10)
+        .background(Color.white.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+}
+
+struct ForecastView: View {
+    let forecast: String
+    
+    var body: some View {
+        VStack(spacing: 10) {
+            HStack {
+                Image(systemName: "text.bubble.fill")
+                    .foregroundStyle(.primary)
+                Text("Climate Forecast")
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+            }
+            .shadow(color: .white.opacity(0.8), radius: 1)
+            
+            Text(forecast)
+                .font(.subheadline)
+                .foregroundStyle(.primary)
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .shadow(color: .white.opacity(0.5), radius: 1)
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 15))
+    }
 }
 
 struct InterventionToggle: View {
@@ -166,23 +310,24 @@ struct InterventionToggle: View {
         VStack(spacing: 10) {
             Text("Climate Interventions")
                 .font(.headline)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
+                .shadow(color: .white.opacity(0.8), radius: 1)
             
             HStack {
                 Text("Without")
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(.secondary)
                 
                 Toggle("", isOn: $isEnabled)
                     .labelsHidden()
                     .tint(.green)
                 
                 Text("With")
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(.secondary)
             }
             
             Text(isEnabled ? "Includes Solar Radiation Management & other interventions" : "Current trajectory")
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
         }
         .padding()
         .background(.ultraThinMaterial)

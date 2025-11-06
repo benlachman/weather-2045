@@ -39,6 +39,32 @@ class WeatherViewModel: ObservableObject {
                 temperatureDelta: delta
             )
             
+            let humidity = response.main.humidity
+            let projectedHumidity = ClimateProjection.projectHumidity(
+                currentHumidity: humidity,
+                temperatureDelta: delta
+            )
+            
+            let windSpeed = response.wind?.speed ?? 0.0
+            let projectedWindSpeed = ClimateProjection.projectWindSpeed(
+                currentWindSpeed: windSpeed,
+                temperatureDelta: delta
+            )
+            
+            let precipitation = response.rain?.oneHour ?? response.rain?.threeHour ?? 0.0
+            let projectedPrecipitation = ClimateProjection.projectPrecipitation(
+                currentPrecipitation: precipitation,
+                temperatureDelta: delta
+            )
+            
+            let forecast = ClimateProjection.generateForecast(
+                locationName: response.name,
+                temperatureDelta: delta,
+                projectedTemp: projectedTemp,
+                projectedCondition: projectedCondition,
+                withInterventions: withInterventions
+            )
+            
             weatherData = Weather2045Data(
                 currentTemp: currentTemp,
                 projectedTemp: projectedTemp,
@@ -46,7 +72,14 @@ class WeatherViewModel: ObservableObject {
                 projectedCondition: projectedCondition,
                 locationName: response.name,
                 temperatureDelta: delta,
-                withInterventions: withInterventions
+                withInterventions: withInterventions,
+                humidity: humidity,
+                projectedHumidity: projectedHumidity,
+                windSpeed: windSpeed,
+                projectedWindSpeed: projectedWindSpeed,
+                precipitation: precipitation,
+                projectedPrecipitation: projectedPrecipitation,
+                forecast: forecast
             )
         } catch {
             errorMessage = error.localizedDescription
@@ -69,6 +102,29 @@ class WeatherViewModel: ObservableObject {
             temperatureDelta: delta
         )
         
+        let projectedHumidity = ClimateProjection.projectHumidity(
+            currentHumidity: current.humidity,
+            temperatureDelta: delta
+        )
+        
+        let projectedWindSpeed = ClimateProjection.projectWindSpeed(
+            currentWindSpeed: current.windSpeed,
+            temperatureDelta: delta
+        )
+        
+        let projectedPrecipitation = ClimateProjection.projectPrecipitation(
+            currentPrecipitation: current.precipitation,
+            temperatureDelta: delta
+        )
+        
+        let forecast = ClimateProjection.generateForecast(
+            locationName: current.locationName,
+            temperatureDelta: delta,
+            projectedTemp: projectedTemp,
+            projectedCondition: projectedCondition,
+            withInterventions: withInterventions
+        )
+        
         weatherData = Weather2045Data(
             currentTemp: current.currentTemp,
             projectedTemp: projectedTemp,
@@ -76,7 +132,14 @@ class WeatherViewModel: ObservableObject {
             projectedCondition: projectedCondition,
             locationName: current.locationName,
             temperatureDelta: delta,
-            withInterventions: withInterventions
+            withInterventions: withInterventions,
+            humidity: current.humidity,
+            projectedHumidity: projectedHumidity,
+            windSpeed: current.windSpeed,
+            projectedWindSpeed: projectedWindSpeed,
+            precipitation: current.precipitation,
+            projectedPrecipitation: projectedPrecipitation,
+            forecast: forecast
         )
     }
 }
