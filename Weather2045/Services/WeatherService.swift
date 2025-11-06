@@ -2,11 +2,9 @@ import Foundation
 import CoreLocation
 
 class WeatherService {
-    // OpenWeatherMap application programming interface key constant
-    // Replace with your actual key from https://openweathermap.org/api
-    // Note: In production apps, use secure storage like Xcode build settings or a configuration file
-    // For this demo app, a constant is acceptable as per the project requirements
-    private let applicationProgrammingInterfaceKey = "YOUR_OPENWEATHERMAP_API_KEY"
+    // OpenWeatherMap API key is stored in Config.swift
+    // Copy Config.swift.example to Config.swift and add your actual API key
+    private let applicationProgrammingInterfaceKey = Config.openWeatherMapAPIKey
     private let baseUniformResourceLocator = "https://api.openweathermap.org/data/2.5/weather"
     
     func fetchWeather(latitude: Double, longitude: Double) async throws -> WeatherResponse {

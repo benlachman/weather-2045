@@ -65,15 +65,16 @@ Weather2045/
 
 ### Setting Up the API Key
 
-1. Open `Weather2045/Services/WeatherService.swift`
-2. Find the line:
+1. Copy `Weather2045/Config.swift.example` to `Weather2045/Config.swift`
+2. Open `Weather2045/Config.swift`
+3. Find the line:
    ```swift
-   private let apiKey = "YOUR_OPENWEATHERMAP_API_KEY"
+   static let openWeatherMapAPIKey = "YOUR_OPENWEATHERMAP_API_KEY"
    ```
-3. Replace `YOUR_OPENWEATHERMAP_API_KEY` with your actual API key
-4. Save the file
+4. Replace `YOUR_OPENWEATHERMAP_API_KEY` with your actual API key
+5. Save the file
 
-**Important**: Never commit your actual API key to version control!
+**Important**: `Config.swift` is in `.gitignore` to prevent accidentally committing your API key to version control. The template file `Config.swift.example` is included in the repository for reference.
 
 ## Building and Running
 

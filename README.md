@@ -25,8 +25,11 @@ A lightweight SwiftUI iOS app that shows synthesized 2045 weather projections ba
 1. Clone this repository
 2. Open `Weather2045.xcodeproj` in Xcode
 3. Get a free application programming interface key from [OpenWeatherMap](https://openweathermap.org/api)
-4. Replace `YOUR_OPENWEATHERMAP_API_KEY` in `Weather2045/Services/WeatherService.swift` with your key
-5. Build and run the app on a simulator or device
+4. Copy `Weather2045/Config.swift.example` to `Weather2045/Config.swift`
+5. Replace `YOUR_OPENWEATHERMAP_API_KEY` in `Weather2045/Config.swift` with your actual API key
+6. Build and run the app on a simulator or device
+
+**Note**: `Config.swift` is in `.gitignore` to prevent accidentally committing your API key. The template file `Config.swift.example` is included in version control for reference.
 
 ## Architecture
 

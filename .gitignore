@@ -60,3 +60,7 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+
+# API Keys and Secrets
+# Prevent committing actual API keys
+Weather2045/Config.swift
