@@ -225,42 +225,40 @@ final class ClimateProjectionTests: XCTestCase {
                             "Projected precipitation should be higher than current")
     }
     
-    func testGenerateForecastIncludesTemperatureDelta() {
+    func testGenerateForecastIncludesWeatherDetails() {
         // Given climate projection data
         let forecast = ClimateProjection.generateForecast(
-            locationName: "San Francisco",
-            temperatureDelta: 2.0,
             projectedTemp: 24.0,
             projectedCondition: "Hot & Clear",
             projectedHumidity: 65,
-            projectedWindSpeed: 6.0,
-            currentWindSpeed: 5.0,
-            withInterventions: false
+            projectedWindSpeed: 6.0
         )
         
-        // Then forecast should mention the temperature delta
-        XCTAssertTrue(forecast.contains("+2.0°C") || forecast.contains("+2.0"),
-                     "Forecast should include temperature delta")
-        XCTAssertTrue(forecast.contains("San Francisco"),
-                     "Forecast should mention location name")
+        // Then forecast should be a natural weather report
+        XCTAssertTrue(forecast.contains("24°C") || forecast.contains("24 °C"),
+                     "Forecast should include temperature")
+        XCTAssertTrue(forecast.contains("Clear") || forecast.contains("Hot"),
+                     "Forecast should mention weather condition")
     }
     
-    func testGenerateForecastWithInterventions() {
-        // Given climate projection with interventions
+    func testGenerateForecastNaturalLanguage() {
+        // Given climate projection
         let forecast = ClimateProjection.generateForecast(
-            locationName: "Seattle",
-            temperatureDelta: 0.8,
             projectedTemp: 16.0,
             projectedCondition: "Clouds",
             projectedHumidity: 70,
-            projectedWindSpeed: 4.5,
-            currentWindSpeed: 4.0,
-            withInterventions: true
+            projectedWindSpeed: 4.5
         )
         
-        // Then forecast should mention interventions
-        XCTAssertTrue(forecast.lowercased().contains("intervention"),
-                     "Forecast should mention climate interventions")
+        // Then forecast should read like a natural weather forecast
+        XCTAssertFalse(forecast.lowercased().contains("intervention"),
+                      "Forecast should not mention interventions")
+        XCTAssertFalse(forecast.lowercased().contains("paris agreement"),
+                      "Forecast should not mention Paris Agreement")
+        XCTAssertFalse(forecast.lowercased().contains("threshold"),
+                      "Forecast should not mention thresholds")
+        XCTAssertTrue(forecast.contains("humidity") || forecast.contains("wind"),
+                     "Forecast should mention weather conditions")
     }
     
     func testProjectWaterAvailability() {

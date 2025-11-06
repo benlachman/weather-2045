@@ -138,14 +138,10 @@ struct ClimateProjection {
     }
     
     static func generateForecast(
-        locationName: String,
-        temperatureDelta: Double,
         projectedTemp: Double,
         projectedCondition: String,
         projectedHumidity: Int,
-        projectedWindSpeed: Double,
-        currentWindSpeed: Double,
-        withInterventions: Bool
+        projectedWindSpeed: Double
     ) -> String {
         var forecast = ""
         

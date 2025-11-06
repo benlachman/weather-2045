@@ -58,14 +58,10 @@ class WeatherViewModel: ObservableObject {
             )
             
             let forecast = ClimateProjection.generateForecast(
-                locationName: response.name,
-                temperatureDelta: delta,
                 projectedTemp: projectedTemp,
                 projectedCondition: projectedCondition,
                 projectedHumidity: projectedHumidity,
-                projectedWindSpeed: projectedWindSpeed,
-                currentWindSpeed: windSpeed,
-                withInterventions: withInterventions
+                projectedWindSpeed: projectedWindSpeed
             )
             
             let waterAvailability = ClimateProjection.projectWaterAvailability(
@@ -142,14 +138,10 @@ class WeatherViewModel: ObservableObject {
         )
         
         let forecast = ClimateProjection.generateForecast(
-            locationName: current.locationName,
-            temperatureDelta: delta,
             projectedTemp: projectedTemp,
             projectedCondition: projectedCondition,
             projectedHumidity: projectedHumidity,
-            projectedWindSpeed: projectedWindSpeed,
-            currentWindSpeed: current.windSpeed,
-            withInterventions: withInterventions
+            projectedWindSpeed: projectedWindSpeed
         )
         
         let waterAvailability = ClimateProjection.projectWaterAvailability(
