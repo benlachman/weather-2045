@@ -262,4 +262,124 @@ final class ClimateProjectionTests: XCTestCase {
         XCTAssertTrue(forecast.lowercased().contains("intervention"),
                      "Forecast should mention climate interventions")
     }
+    
+    func testProjectWaterAvailability() {
+        // Given current conditions
+        let currentHumidity = 60
+        let temperatureDelta = 2.0
+        let precipitation = 5.0
+        
+        // When projecting water availability
+        let waterAvailability = ClimateProjection.projectWaterAvailability(
+            currentHumidity: currentHumidity,
+            temperatureDelta: temperatureDelta,
+            precipitation: precipitation
+        )
+        
+        // Then availability should be reduced due to warming
+        XCTAssertGreaterThanOrEqual(waterAvailability, 25,
+                                   "Water availability should not go below 25%")
+        XCTAssertLessThanOrEqual(waterAvailability, 100,
+                                "Water availability should not exceed 100%")
+    }
+    
+    func testProjectWaterAvailabilityDryConditions() {
+        // Given dry conditions
+        let currentHumidity = 30
+        let temperatureDelta = 2.5
+        let precipitation = 0.5
+        
+        // When projecting water availability
+        let waterAvailability = ClimateProjection.projectWaterAvailability(
+            currentHumidity: currentHumidity,
+            temperatureDelta: temperatureDelta,
+            precipitation: precipitation
+        )
+        
+        // Then availability should be significantly reduced
+        XCTAssertLessThan(waterAvailability, 70,
+                         "Dry conditions should result in lower water availability")
+    }
+    
+    func testProjectGardeningImpact() {
+        // Given different temperature deltas
+        let lowDelta = 0.8
+        let moderateDelta = 1.3
+        let highDelta = 2.0
+        let severeDelta = 3.0
+        
+        // When projecting gardening impact
+        let lowImpact = ClimateProjection.projectGardeningImpact(
+            temperatureDelta: lowDelta,
+            projectedTemp: 20.0,
+            precipitation: 5.0
+        )
+        let moderateImpact = ClimateProjection.projectGardeningImpact(
+            temperatureDelta: moderateDelta,
+            projectedTemp: 22.0,
+            precipitation: 5.0
+        )
+        let highImpact = ClimateProjection.projectGardeningImpact(
+            temperatureDelta: highDelta,
+            projectedTemp: 24.0,
+            precipitation: 5.0
+        )
+        let severeImpact = ClimateProjection.projectGardeningImpact(
+            temperatureDelta: severeDelta,
+            projectedTemp: 26.0,
+            precipitation: 5.0
+        )
+        
+        // Then impacts should escalate with temperature
+        XCTAssertTrue(lowImpact.contains("Minimal"),
+                     "Low delta should indicate minimal changes")
+        XCTAssertTrue(moderateImpact.contains("Extended"),
+                     "Moderate delta should indicate extended growing season")
+        XCTAssertTrue(highImpact.contains("altered") || highImpact.contains("Significantly"),
+                     "High delta should indicate significant changes")
+        XCTAssertTrue(severeImpact.contains("Major") || severeImpact.contains("disruption"),
+                     "Severe delta should indicate major disruption")
+    }
+    
+    func testProjectDisasterRisk() {
+        // Given low-risk conditions
+        let lowRisk = ClimateProjection.projectDisasterRisk(
+            temperatureDelta: 0.8,
+            windSpeed: 5.0,
+            precipitation: 5.0
+        )
+        
+        // Given high-risk conditions
+        let highRisk = ClimateProjection.projectDisasterRisk(
+            temperatureDelta: 3.0,
+            windSpeed: 20.0,
+            precipitation: 60.0
+        )
+        
+        // Then risk levels should be appropriate
+        XCTAssertTrue(lowRisk == "Low" || lowRisk == "Moderate",
+                     "Low-risk conditions should result in Low or Moderate risk")
+        XCTAssertTrue(highRisk == "High" || highRisk == "Severe",
+                     "High-risk conditions should result in High or Severe risk")
+    }
+    
+    func testProjectDisasterRiskEscalation() {
+        // Test that risk escalates with increasing factors
+        let baseline = ClimateProjection.projectDisasterRisk(
+            temperatureDelta: 1.0,
+            windSpeed: 8.0,
+            precipitation: 10.0
+        )
+        
+        let increased = ClimateProjection.projectDisasterRisk(
+            temperatureDelta: 2.5,
+            windSpeed: 15.0,
+            precipitation: 40.0
+        )
+        
+        // Baseline should be lower risk than increased
+        let riskLevels = ["Low": 0, "Moderate": 1, "High": 2, "Severe": 3]
+        XCTAssertLessThanOrEqual(riskLevels[baseline] ?? 0, riskLevels[increased] ?? 0,
+                                 "Risk should escalate with increasing climate factors")
+    }
 }

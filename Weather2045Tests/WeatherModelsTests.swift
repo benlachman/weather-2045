@@ -69,7 +69,10 @@ final class WeatherModelsTests: XCTestCase {
             projectedWindSpeed: 5.8,
             precipitation: 0.0,
             projectedPrecipitation: 0.0,
-            forecast: "Sample forecast"
+            forecast: "Sample forecast",
+            waterAvailability: 75,
+            gardeningImpact: "Extended growing season",
+            disasterRisk: "Moderate"
         )
         
         // When formatting for display
@@ -99,7 +102,10 @@ final class WeatherModelsTests: XCTestCase {
             projectedWindSpeed: 5.0,
             precipitation: 0.0,
             projectedPrecipitation: 0.0,
-            forecast: "Sample forecast"
+            forecast: "Sample forecast",
+            waterAvailability: 85,
+            gardeningImpact: "Minimal changes",
+            disasterRisk: "Low"
         )
         
         // When formatting the delta
@@ -215,7 +221,10 @@ final class WeatherModelsTests: XCTestCase {
             projectedWindSpeed: 4.6,
             precipitation: 2.5,
             projectedPrecipitation: 3.0,
-            forecast: "Climate forecast for Portland"
+            forecast: "Climate forecast for Portland",
+            waterAvailability: 70,
+            gardeningImpact: "Extended growing season",
+            disasterRisk: "Moderate"
         )
         
         // When accessing climate indicators
@@ -233,5 +242,10 @@ final class WeatherModelsTests: XCTestCase {
         XCTAssertEqual(displayProjectedWindSpeed, "4.6 m/s")
         XCTAssertEqual(displayPrecipitation, "2.5 mm")
         XCTAssertEqual(displayProjectedPrecipitation, "3.0 mm")
+        
+        // Test new climate factors
+        XCTAssertEqual(weatherData.waterAvailability, 70)
+        XCTAssertEqual(weatherData.gardeningImpact, "Extended growing season")
+        XCTAssertEqual(weatherData.disasterRisk, "Moderate")
     }
 }
