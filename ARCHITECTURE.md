@@ -79,8 +79,19 @@
 │                        Models                                │
 ├─────────────────────────────────────────────────────────────┤
 │  • WeatherResponse (API data)                               │
+│    - MainWeather (temp, humidity, pressure)                 │
+│    - Wind (speed)                                           │
+│    - Clouds (cloudiness)                                    │
+│    - Precipitation (rain/snow)                              │
 │  • Weather2045Data (App data)                               │
+│    - Temperature, condition, location                       │
+│    - Climate indicators (humidity, wind, precipitation)     │
+│    - Natural language forecast                              │
 │  • ClimateProjection (Projection logic)                     │
+│    - Temperature projection                                 │
+│    - Climate indicator projections                          │
+│    - Forecast generation                                    │
+│    - Color coding logic                                     │
 └─────────────────────────────────────────────────────────────┘
                             │
                             │ Used by
@@ -105,11 +116,22 @@
 │  • Main app container                                       │
 │  • Manages LocationManager                                  │
 │  • Observes WeatherViewModel                                │
+│  • ScrollView for all content                               │
 │                                                             │
 │  WeatherDisplayView                                         │
 │  • Displays current vs 2045 weather                         │
 │  • SF Symbols for conditions                                │
+│  • Color-coded temperature (1.5°C threshold)                │
 │  • Temperature and delta                                    │
+│                                                             │
+│  ClimateConditionsView                                      │
+│  • Climate impact indicators                                │
+│  • Humidity, wind, precipitation displays                   │
+│  • Current vs projected comparisons                         │
+│                                                             │
+│  ForecastView                                               │
+│  • Natural language climate forecast                        │
+│  • Based on synthesized 2045 data                           │
 │                                                             │
 │  InterventionToggle                                         │
 │  • With/Without toggle                                      │
@@ -120,29 +142,46 @@
 ## Climate Projection Algorithm
 
 ```
-Input: currentTempF, withInterventions
+Input: currentTempC (Celsius), withInterventions
 
-Step 1: Convert to Celsius
-  currentTempC = (currentTempF - 32) × 5/9
-
-Step 2: Apply Climate Delta
+Step 1: Apply Climate Delta
   baselineWarming = 2.5°C
   regionalFactor = 0.8
-  warmingDelta = baselineWarming × regionalFactor
+  warmingDelta = baselineWarming × regionalFactor = 2.0°C
 
-Step 3: Apply Interventions (if enabled)
+Step 2: Apply Interventions (if enabled)
   if withInterventions:
     interventionCooling = 1.2°C
   else:
     interventionCooling = 0°C
 
-Step 4: Calculate Projected Temperature
+Step 3: Calculate Projected Temperature
   projectedTempC = currentTempC + warmingDelta - interventionCooling
 
-Step 5: Convert back to Fahrenheit
-  projectedTempF = projectedTempC × 9/5 + 32
+Step 4: Project Climate Indicators
+  projectedHumidity = min(100, currentHumidity + temperatureDelta × 2.5)
+  projectedWindSpeed = currentWindSpeed × (1.0 + temperatureDelta × 0.15)
+  projectedPrecipitation = currentPrecipitation × (1.0 + temperatureDelta × 0.20)
 
-Output: projectedTempF
+Step 5: Determine Weather Condition Intensification
+  if temperatureDelta > 1.5°C:
+    Apply condition intensification (Rain → Heavy Rain, etc.)
+
+Step 6: Generate Natural Language Forecast
+  Based on temperatureDelta, humidity, wind, precipitation, and interventions
+
+Output: projectedTempC, climate indicators, forecast
+```
+
+## Temperature Color Coding
+
+Based on Paris Agreement 1.5°C threshold:
+
+```
+Delta < 1.5°C  → Green  (Below critical threshold)
+Delta < 2.0°C  → Yellow (Approaching dangerous levels)
+Delta < 2.5°C  → Orange (Significant climate impact)
+Delta ≥ 2.5°C  → Red    (Severe warming)
 ```
 
 ## State Management
@@ -227,6 +266,9 @@ Weather2045/
 ├── Views
 │   ├── ContentView.swift
 │   ├── WeatherDisplayView (subview)
+│   ├── ClimateConditionsView (subview)
+│   ├── ClimateIndicator (subview)
+│   ├── ForecastView (subview)
 │   └── InterventionToggle (subview)
 │
 ├── View Model
@@ -237,11 +279,22 @@ Weather2045/
 │   │   ├── WeatherResponse (Codable)
 │   │   ├── MainWeather (Codable)
 │   │   ├── WeatherCondition (Codable)
+│   │   ├── Wind (Codable)
+│   │   ├── Clouds (Codable)
+│   │   ├── Precipitation (Codable)
 │   │   └── Weather2045Data
+│   │       ├── Temperature data (Celsius)
+│   │       ├── Climate indicators (humidity, wind, precipitation)
+│   │       └── Forecast text
 │   └── ClimateProjection.swift
 │       ├── project2045Temperature()
 │       ├── calculateTemperatureDelta()
-│       └── project2045Condition()
+│       ├── project2045Condition()
+│       ├── projectHumidity()
+│       ├── projectWindSpeed()
+│       ├── projectPrecipitation()
+│       ├── generateForecast()
+│       └── temperatureColor()
 │
 └── Services/
     ├── LocationManager.swift

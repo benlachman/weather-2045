@@ -16,6 +16,7 @@
 		A0000013000000010000001 /* WeatherModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000014000000010000001 /* WeatherModels.swift */; };
 		A0000015000000010000001 /* ClimateProjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000016000000010000001 /* ClimateProjection.swift */; };
 		A0000017000000010000001 /* WeatherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000018000000010000001 /* WeatherViewModel.swift */; };
+		B5D1374D2EBD425100414106 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D1374C2EBD425100414106 /* Config.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +30,7 @@
 		A0000016000000010000001 /* ClimateProjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimateProjection.swift; sourceTree = "<group>"; };
 		A0000018000000010000001 /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
 		A0000019000000010000001 /* Weather2045.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Weather2045.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B5D1374C2EBD425100414106 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +62,7 @@
 				A0000025000000010000001 /* Services */,
 				A0000006000000010000001 /* Assets.xcassets */,
 				A0000026000000010000001 /* Preview Content */,
+				B5D1374C2EBD425100414106 /* Config.swift */,
 			);
 			path = Weather2045;
 			sourceTree = "<group>";
@@ -173,6 +176,7 @@
 				A0000003000000010000001 /* ContentView.swift in Sources */,
 				A0000017000000010000001 /* WeatherViewModel.swift in Sources */,
 				A0000011000000010000001 /* WeatherService.swift in Sources */,
+				B5D1374D2EBD425100414106 /* Config.swift in Sources */,
 				A0000009000000010000001 /* LocationManager.swift in Sources */,
 				A0000001000000010000001 /* Weather2045App.swift in Sources */,
 			);

@@ -1,0 +1,9 @@
+import Foundation
+
+/// Configuration file for API keys and secrets
+/// Copy this file to Config.swift and add your actual API key
+enum Config {
+    /// OpenWeatherMap API Key
+    /// Get your free API key from https://openweathermap.org/api
+    static let openWeatherMapAPIKey = "YOUR_OPENWEATHERMAP_API_KEY"
+}

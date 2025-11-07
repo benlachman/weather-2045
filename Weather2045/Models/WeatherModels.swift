@@ -4,6 +4,10 @@ struct WeatherResponse: Codable {
     let main: MainWeather
     let weather: [WeatherCondition]
     let name: String
+    let wind: Wind?
+    let clouds: Clouds?
+    let rain: Precipitation?
+    let snow: Precipitation?
     
     struct MainWeather: Codable {
         let temp: Double
@@ -11,6 +15,7 @@ struct WeatherResponse: Codable {
         let tempMin: Double
         let tempMax: Double
         let humidity: Int
+        let pressure: Int?
         
         enum CodingKeys: String, CodingKey {
             case temp
@@ -18,6 +23,7 @@ struct WeatherResponse: Codable {
             case tempMin = "temp_min"
             case tempMax = "temp_max"
             case humidity
+            case pressure
         }
     }
     
@@ -26,6 +32,24 @@ struct WeatherResponse: Codable {
         let main: String
         let description: String
         let icon: String
+    }
+    
+    struct Wind: Codable {
+        let speed: Double
+    }
+    
+    struct Clouds: Codable {
+        let all: Int
+    }
+    
+    struct Precipitation: Codable {
+        let oneHour: Double?
+        let threeHour: Double?
+        
+        enum CodingKeys: String, CodingKey {
+            case oneHour = "1h"
+            case threeHour = "3h"
+        }
     }
 }
 
@@ -37,16 +61,94 @@ struct Weather2045Data {
     let locationName: String
     let temperatureDelta: Double
     let withInterventions: Bool
+    let humidity: Int
+    let projectedHumidity: Int
+    let windSpeed: Double
+    let projectedWindSpeed: Double
+    let precipitation: Double
+    let projectedPrecipitation: Double
+    let forecast: String
+    
+    // New climate factors
+    let waterAvailability: Int // Percentage (0-100)
+    let agricultureImpact: String // Description of impact
+    let disasterRisk: String // Low, Moderate, High, Severe
     
     var displayCurrentTemp: String {
-        String(format: "%.0f°", currentTemp)
+        String(format: "%.1f°C", currentTemp)
     }
     
     var displayProjectedTemp: String {
-        String(format: "%.0f°", projectedTemp)
+        String(format: "%.1f°C", projectedTemp)
     }
     
     var displayDelta: String {
-        String(format: "%+.1f°", temperatureDelta)
+        String(format: "%+.1f°C", temperatureDelta)
+    }
+    
+    var displayHumidity: String {
+        "\(humidity)%"
+    }
+    
+    var displayProjectedHumidity: String {
+        "\(projectedHumidity)%"
+    }
+    
+    var displayWindSpeed: String {
+        String(format: "%.1f m/s", windSpeed)
+    }
+    
+    var displayProjectedWindSpeed: String {
+        String(format: "%.1f m/s", projectedWindSpeed)
+    }
+    
+    var displayPrecipitation: String {
+        String(format: "%.1f mm", precipitation)
+    }
+    
+    var displayProjectedPrecipitation: String {
+        String(format: "%.1f mm", projectedPrecipitation)
+    }
+    
+    var humidityDelta: Int {
+        projectedHumidity - humidity
+    }
+    
+    var windSpeedDelta: Double {
+        projectedWindSpeed - windSpeed
+    }
+    
+    var precipitationDelta: Double {
+        projectedPrecipitation - precipitation
+    }
+    
+    var displayHumidityDelta: String {
+        "+\(humidityDelta)%"
+    }
+    
+    var displayWindSpeedDelta: String {
+        String(format: "+%.1f m/s", windSpeedDelta)
+    }
+    
+    var todayDate2045: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, MMMM d, yyyy"
+        let calendar = Calendar.current
+        let now = Date()
+
+        // Get current month and day
+        let components = calendar.dateComponents([.month, .day], from: now)
+
+        // Create date components for 2045 with same month/day
+        var newComponents = DateComponents()
+        newComponents.year = 2045
+        newComponents.month = components.month
+        newComponents.day = components.day
+
+        // Create the date
+        if let year2045 = calendar.date(from: newComponents) {
+            return formatter.string(from: year2045)
+        }
+        return "2045"
     }
 }
