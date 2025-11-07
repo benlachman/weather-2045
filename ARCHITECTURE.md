@@ -93,7 +93,7 @@ Computes 6 impact metrics:
 
 ### Data Models
 
-#### Core Models (`CoreDataModels.swift`)
+#### Core Models (`ClimateDataModels.swift`)
 
 ```swift
 struct ObservedWeather {
@@ -341,7 +341,7 @@ Weather2045/
 ├── ContentView.swift             # Main UI
 │
 ├── Models/
-│   ├── CoreDataModels.swift      # Core data structures
+│   ├── ClimateDataModels.swift    # Core data structures
 │   ├── WeatherModels.swift       # API response models
 │   └── ClimateProjection.swift   # (Legacy, can be deprecated)
 │
