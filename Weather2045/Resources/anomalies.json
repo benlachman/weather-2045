@@ -1,0 +1,80 @@
+[
+  {
+    "gridCell": {"latitude": 37.0, "longitude": -122.0},
+    "month": 1,
+    "scenario": "BAU",
+    "anomaly": {
+      "dT_mean": 2.8,
+      "dT_max": 3.5,
+      "dP_wetProb": 0.05,
+      "dP_intensity": 0.15,
+      "dDrySpellDays": 3,
+      "dHotDays90F": 8
+    }
+  },
+  {
+    "gridCell": {"latitude": 37.0, "longitude": -122.0},
+    "month": 1,
+    "scenario": "Mitigation",
+    "anomaly": {
+      "dT_mean": 1.9,
+      "dT_max": 2.4,
+      "dP_wetProb": 0.03,
+      "dP_intensity": 0.10,
+      "dDrySpellDays": 2,
+      "dHotDays90F": 5
+    }
+  },
+  {
+    "gridCell": {"latitude": 40.0, "longitude": -74.0},
+    "month": 7,
+    "scenario": "BAU",
+    "anomaly": {
+      "dT_mean": 3.0,
+      "dT_max": 3.8,
+      "dP_wetProb": 0.04,
+      "dP_intensity": 0.18,
+      "dDrySpellDays": 4,
+      "dHotDays90F": 15
+    }
+  },
+  {
+    "gridCell": {"latitude": 40.0, "longitude": -74.0},
+    "month": 7,
+    "scenario": "Mitigation",
+    "anomaly": {
+      "dT_mean": 2.0,
+      "dT_max": 2.6,
+      "dP_wetProb": 0.03,
+      "dP_intensity": 0.12,
+      "dDrySpellDays": 2,
+      "dHotDays90F": 9
+    }
+  },
+  {
+    "gridCell": {"latitude": 51.0, "longitude": 0.0},
+    "month": 6,
+    "scenario": "BAU",
+    "anomaly": {
+      "dT_mean": 2.7,
+      "dT_max": 3.4,
+      "dP_wetProb": 0.02,
+      "dP_intensity": 0.14,
+      "dDrySpellDays": 5,
+      "dHotDays90F": 10
+    }
+  },
+  {
+    "gridCell": {"latitude": 51.0, "longitude": 0.0},
+    "month": 6,
+    "scenario": "Mitigation",
+    "anomaly": {
+      "dT_mean": 1.8,
+      "dT_max": 2.3,
+      "dP_wetProb": 0.01,
+      "dP_intensity": 0.09,
+      "dDrySpellDays": 3,
+      "dHotDays90F": 6
+    }
+  }
+]
