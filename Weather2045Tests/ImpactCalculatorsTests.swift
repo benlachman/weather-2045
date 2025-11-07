@@ -215,14 +215,14 @@ final class ImpactCalculatorsTests: XCTestCase {
         let delta = 5.0
         
         // When
-        let extension = ImpactCalculators.estimateMosquitoSeasonExtension(
+        let seasonExtension = ImpactCalculators.estimateMosquitoSeasonExtension(
             currentAvgTempC: currentAvg,
             futureAvgTempC: futureAvg,
             tempDeltaC: delta
         )
         
         // Then
-        XCTAssertGreaterThan(extension, 0)
+        XCTAssertGreaterThan(seasonExtension, 0)
     }
     
     func testEstimatePollenSeasonExtension() {
@@ -230,11 +230,11 @@ final class ImpactCalculatorsTests: XCTestCase {
         let tempDelta = 2.0
         
         // When
-        let extension = ImpactCalculators.estimatePollenSeasonExtension(tempDeltaMinC: tempDelta)
+        let seasonExtension = ImpactCalculators.estimatePollenSeasonExtension(tempDeltaMinC: tempDelta)
         
         // Then
         // ~14 days per degree, so 2 * 14 = 28
-        XCTAssertEqual(extension, 28)
+        XCTAssertEqual(seasonExtension, 28)
     }
     
     func testThermalComfortImpact() {

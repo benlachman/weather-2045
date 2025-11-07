@@ -149,10 +149,6 @@ struct ImpactCalculators {
     ) -> Int {
         let threshold = 18.0
         
-        // Estimate days per month above threshold
-        let currentDays = currentAvgTempC > threshold ? 30 : 0
-        let futureDays = futureAvgTempC > threshold ? 30 : 0
-        
         // Rough annual estimate: multiply by months in season
         // Assume current season is ~6 months, extend by temp delta
         let seasonExtensionMonths = Int(tempDeltaC / 2.0)  // ~1 month per 2°C
@@ -282,20 +278,20 @@ struct ImpactCalculators {
         observed: ObservedWeather,
         synthesized: SynthesizedWeather
     ) -> ImpactCard {
-        let extension = estimateMosquitoSeasonExtension(
+        let seasonExtension = estimateMosquitoSeasonExtension(
             currentAvgTempC: observed.tempC,
             futureAvgTempC: synthesized.tempC,
             tempDeltaC: synthesized.tempC - observed.tempC
         )
         
-        let value = "+\(extension) days"
+        let value = "+\(seasonExtension) days"
         let description = "Mosquito season extends with warming."
         
         return ImpactCard(
             type: .vectorSeason,
             value: value,
             description: description,
-            severity: extension > 60 ? .high : (extension > 30 ? .moderate : .low)
+            severity: seasonExtension > 60 ? .high : (seasonExtension > 30 ? .moderate : .low)
         )
     }
     
@@ -303,16 +299,16 @@ struct ImpactCalculators {
     static func allergySeasonImpact(
         tempDeltaC: Double
     ) -> ImpactCard {
-        let extension = estimatePollenSeasonExtension(tempDeltaMinC: tempDeltaC)
+        let seasonExtension = estimatePollenSeasonExtension(tempDeltaMinC: tempDeltaC)
         
-        let value = "+\(extension) days"
+        let value = "+\(seasonExtension) days"
         let description = "Pollen season extends as frost-free period increases."
         
         return ImpactCard(
             type: .allergySeason,
             value: value,
             description: description,
-            severity: extension > 28 ? .high : (extension > 14 ? .moderate : .low)
+            severity: seasonExtension > 28 ? .high : (seasonExtension > 14 ? .moderate : .low)
         )
     }
     
