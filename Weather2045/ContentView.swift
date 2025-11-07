@@ -235,8 +235,8 @@ struct AdditionalClimateFactorsView: View {
                 
                 ClimateFactorRow(
                     icon: "leaf.fill",
-                    label: "Gardening Impact",
-                    value: weather.gardeningImpact,
+                    label: "Agriculture",
+                    value: weather.agricultureImpact,
                     valueColor: .primary
                 )
                 
@@ -503,7 +503,7 @@ struct InterventionToggle: View {
                     .foregroundStyle(.secondary)
             }
             
-            Text(isEnabled ? "Includes Solar Radiation Management & other interventions" : "Business as usual trajectory")
+            Text(isEnabled ? "Includes Solar Radiation Management & other interventions" : "Baseline scenario")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -512,13 +512,20 @@ struct InterventionToggle: View {
         .padding(.top, 20)
         .padding(.bottom, 20)
         .frame(maxWidth: .infinity)
-        .background(.ultraThinMaterial)
+        .background {
+            if #available(iOS 18.0, *) {
+                .thinMaterial
+            } else {
+                .ultraThinMaterial
+            }
+        }
         .ignoresSafeArea(edges: .bottom)
     }
 }
 
 struct MapLocationPicker: View {
     @Environment(\.dismiss) var dismiss
+    @StateObject private var locationManager = LocationManager()
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
         span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10)
@@ -531,38 +538,57 @@ struct MapLocationPicker: View {
             ZStack {
                 Map(coordinateRegion: $region, interactionModes: .all, showsUserLocation: true)
                 
-                // Center pin indicator
-                Image(systemName: "mappin.circle.fill")
-                    .font(.system(size: 40))
+                // Center reticle indicator
+                Image(systemName: "scope")
+                    .font(.system(size: 50))
                     .foregroundStyle(.red)
                     .shadow(radius: 3)
                 
                 VStack {
                     Spacer()
-                    VStack(spacing: 16) {
-                        Text("Center the map on your desired location")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .padding(.horizontal)
-                        
-                        HStack(spacing: 16) {
-                            Button("Cancel") {
-                                dismiss()
-                            }
-                            .buttonStyle(.bordered)
-                            
-                            Button("Select Location") {
-                                onLocationSelected(region.center)
-                            }
-                            .buttonStyle(.borderedProminent)
-                        }
-                        .padding()
+                    
+                    // Bottom button with matching intervention toggle styling
+                    Button(action: {
+                        onLocationSelected(region.center)
+                    }) {
+                        Text("See Weather Here")
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
                     }
-                    .background(.ultraThinMaterial)
+                    .background {
+                        if #available(iOS 18.0, *) {
+                            .thinMaterial
+                        } else {
+                            .ultraThinMaterial
+                        }
+                    }
+                    .ignoresSafeArea(edges: .bottom)
                 }
             }
             .navigationTitle("Choose Location")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        if let location = locationManager.location {
+                            region.center = location.coordinate
+                        }
+                    }) {
+                        Image(systemName: "location.fill")
+                    }
+                }
+            }
+        }
+        .onAppear {
+            locationManager.requestLocation()
         }
     }
 }

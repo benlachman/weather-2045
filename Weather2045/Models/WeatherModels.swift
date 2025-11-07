@@ -71,7 +71,7 @@ struct Weather2045Data {
     
     // New climate factors
     let waterAvailability: Int // Percentage (0-100)
-    let gardeningImpact: String // Description of impact
+    let agricultureImpact: String // Description of impact
     let disasterRisk: String // Low, Moderate, High, Severe
     
     var displayCurrentTemp: String {

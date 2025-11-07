@@ -70,7 +70,7 @@ class WeatherViewModel: ObservableObject {
                 precipitation: precipitation
             )
             
-            let gardeningImpact = ClimateProjection.projectGardeningImpact(
+            let agricultureImpact = ClimateProjection.projectAgricultureImpact(
                 temperatureDelta: delta,
                 projectedTemp: projectedTemp,
                 precipitation: projectedPrecipitation
@@ -98,7 +98,7 @@ class WeatherViewModel: ObservableObject {
                 projectedPrecipitation: projectedPrecipitation,
                 forecast: forecast,
                 waterAvailability: waterAvailability,
-                gardeningImpact: gardeningImpact,
+                agricultureImpact: agricultureImpact,
                 disasterRisk: disasterRisk
             )
         } catch {
@@ -150,7 +150,7 @@ class WeatherViewModel: ObservableObject {
             precipitation: current.precipitation
         )
         
-        let gardeningImpact = ClimateProjection.projectGardeningImpact(
+        let agricultureImpact = ClimateProjection.projectAgricultureImpact(
             temperatureDelta: delta,
             projectedTemp: projectedTemp,
             precipitation: projectedPrecipitation
@@ -178,7 +178,7 @@ class WeatherViewModel: ObservableObject {
             projectedPrecipitation: projectedPrecipitation,
             forecast: forecast,
             waterAvailability: waterAvailability,
-            gardeningImpact: gardeningImpact,
+            agricultureImpact: agricultureImpact,
             disasterRisk: disasterRisk
         )
     }

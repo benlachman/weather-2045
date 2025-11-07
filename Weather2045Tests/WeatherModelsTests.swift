@@ -71,7 +71,7 @@ final class WeatherModelsTests: XCTestCase {
             projectedPrecipitation: 0.0,
             forecast: "Sample forecast",
             waterAvailability: 75,
-            gardeningImpact: "Extended growing season",
+            agricultureImpact: "Extended growing season",
             disasterRisk: "Moderate"
         )
         
@@ -104,7 +104,7 @@ final class WeatherModelsTests: XCTestCase {
             projectedPrecipitation: 0.0,
             forecast: "Sample forecast",
             waterAvailability: 85,
-            gardeningImpact: "Minimal changes",
+            agricultureImpact: "Minimal changes",
             disasterRisk: "Low"
         )
         
@@ -223,7 +223,7 @@ final class WeatherModelsTests: XCTestCase {
             projectedPrecipitation: 3.0,
             forecast: "Climate forecast for Portland",
             waterAvailability: 70,
-            gardeningImpact: "Extended growing season",
+            agricultureImpact: "Extended growing season",
             disasterRisk: "Moderate"
         )
         
@@ -245,7 +245,7 @@ final class WeatherModelsTests: XCTestCase {
         
         // Test new climate factors
         XCTAssertEqual(weatherData.waterAvailability, 70)
-        XCTAssertEqual(weatherData.gardeningImpact, "Extended growing season")
+        XCTAssertEqual(weatherData.agricultureImpact, "Extended growing season")
         XCTAssertEqual(weatherData.disasterRisk, "Moderate")
     }
 }

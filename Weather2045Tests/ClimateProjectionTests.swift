@@ -299,30 +299,30 @@ final class ClimateProjectionTests: XCTestCase {
                          "Dry conditions should result in lower water availability")
     }
     
-    func testProjectGardeningImpact() {
+    func testProjectAgricultureImpact() {
         // Given different temperature deltas
         let lowDelta = 0.8
         let moderateDelta = 1.3
         let highDelta = 2.0
         let severeDelta = 3.0
         
-        // When projecting gardening impact
-        let lowImpact = ClimateProjection.projectGardeningImpact(
+        // When projecting agriculture impact
+        let lowImpact = ClimateProjection.projectAgricultureImpact(
             temperatureDelta: lowDelta,
             projectedTemp: 20.0,
             precipitation: 5.0
         )
-        let moderateImpact = ClimateProjection.projectGardeningImpact(
+        let moderateImpact = ClimateProjection.projectAgricultureImpact(
             temperatureDelta: moderateDelta,
             projectedTemp: 22.0,
             precipitation: 5.0
         )
-        let highImpact = ClimateProjection.projectGardeningImpact(
+        let highImpact = ClimateProjection.projectAgricultureImpact(
             temperatureDelta: highDelta,
             projectedTemp: 24.0,
             precipitation: 5.0
         )
-        let severeImpact = ClimateProjection.projectGardeningImpact(
+        let severeImpact = ClimateProjection.projectAgricultureImpact(
             temperatureDelta: severeDelta,
             projectedTemp: 26.0,
             precipitation: 5.0
@@ -333,7 +333,7 @@ final class ClimateProjectionTests: XCTestCase {
                      "Low delta should indicate minimal changes")
         XCTAssertTrue(moderateImpact.contains("Extended"),
                      "Moderate delta should indicate extended growing season")
-        XCTAssertTrue(highImpact.contains("altered") || highImpact.contains("Significantly"),
+        XCTAssertTrue(highImpact.contains("Altered") || highImpact.contains("zones"),
                      "High delta should indicate significant changes")
         XCTAssertTrue(severeImpact.contains("Major") || severeImpact.contains("disruption"),
                      "Severe delta should indicate major disruption")

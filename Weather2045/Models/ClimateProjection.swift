@@ -87,15 +87,15 @@ struct ClimateProjection {
         return max(minWaterAvailability, min(maxWaterAvailability, availability))
     }
     
-    static func projectGardeningImpact(temperatureDelta: Double, projectedTemp: Double, precipitation: Double) -> String {
+    static func projectAgricultureImpact(temperatureDelta: Double, projectedTemp: Double, precipitation: Double) -> String {
         if temperatureDelta < 1.0 {
-            return "Minimal changes to growing season"
+            return "Minimal changes"
         } else if temperatureDelta < 1.5 {
-            return "Extended growing season, some heat-sensitive crops stressed"
+            return "Extended growing season"
         } else if temperatureDelta < 2.5 {
-            return "Significantly altered growing zones, traditional crops may struggle"
+            return "Altered growing zones"
         } else {
-            return "Major disruption to agriculture, heat-tolerant crops required"
+            return "Major disruption, heat-tolerant crops needed"
         }
     }
     
