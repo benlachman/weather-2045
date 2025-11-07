@@ -1,30 +1,35 @@
 # Weather 2045
 
-A lightweight SwiftUI iOS app that shows synthesized 2045 weather projections based on today's observations.
+A lightweight SwiftUI iOS app that shows synthesized 2045 weather projections based on today's observations and climate science models.
 
 ## Features
 
 - **Current Weather**: Displays current temperature and conditions using your location
-- **2045 Projections**: Shows projected weather for 2045 based on climate models
-- **Climate Impact Indicators**: View projected changes in humidity, wind speed, and precipitation
-- **Natural Language Forecast**: Readable climate forecast based on synthesized 2045 data
-- **Color-Coded Temperatures**: Visual indicators showing warming severity relative to 1.5°C Paris Agreement threshold
-- **Climate Interventions Toggle**: Compare scenarios with/without interventions (Solar Radiation Management, etc.)
+- **2045 Projections**: Shows projected weather for 2045 based on climate models with localized anomaly data
+- **Impact Cards**: Visual "wow" indicators showing:
+  - Heat Index / Thermal Comfort changes
+  - Heavy precipitation / cloudburst risk
+  - Dry spell / drought risk  
+  - Air quality / ozone risk (warm months)
+  - Vector season extension (mosquitoes)
+  - Allergy season extension
+- **Climate Interventions Toggle**: Compare BAU (business-as-usual) vs Mitigation scenarios with SRM/CDR offsets
 - **Metric Units**: All measurements in SI units (Celsius, m/s, mm)
-- **Beautiful UI**: Clean SwiftUI interface with improved readability and SF Symbols for weather conditions
+- **Beautiful UI**: Clean SwiftUI interface with improved readability and SF Symbols
+- **On-Device Processing**: All calculations happen locally; your location never leaves your device
 - **Location-based**: Uses Core Location to get weather for your current location
 
 ## Requirements
 
 - iOS 18.0+
 - Xcode 15.0+
-- OpenWeatherMap application programming interface key
+- OpenWeatherMap API key
 
 ## Setup
 
 1. Clone this repository
 2. Open `Weather2045.xcodeproj` in Xcode
-3. Get a free application programming interface key from [OpenWeatherMap](https://openweathermap.org/api)
+3. Get a free API key from [OpenWeatherMap](https://openweathermap.org/api)
 4. Copy `Weather2045/Config.swift.example` to `Weather2045/Config.swift`
 5. Replace `YOUR_OPENWEATHERMAP_API_KEY` in `Weather2045/Config.swift` with your actual API key
 6. Build and run the app on a simulator or device
@@ -33,38 +38,72 @@ A lightweight SwiftUI iOS app that shows synthesized 2045 weather projections ba
 
 ## Architecture
 
-The app follows a clean architecture with:
+The app follows MVVM pattern with centralized state management:
 
-- **Models**: Data structures for weather and climate projections
-- **Services**: Location management and weather application programming interface integration
-- **ViewModel**: Business logic and state management
-- **Views**: SwiftUI views for the user interface
+- **AppState**: Centralized observable state for the entire app
+- **Models**: Data structures (ObservedWeather, Anomaly, SynthesizedWeather, ImpactCard)
+- **Services**: 
+  - `WeatherService`: OpenWeatherMap API integration
+  - `AnomalyProvider`: Loads monthly climate anomalies (static JSON + parametric fallback)
+  - `SynthesisEngine`: Delta mapping for temperature, humidity, precipitation
+  - `ImpactCalculators`: Computes heat index, cloudburst risk, drought days, etc.
+  - `LocationManager`: Core Location integration
+- **Views**: SwiftUI components with no singleton dependencies
 
-No singletons are used; dependencies are managed through SwiftUI's `@StateObject` and `@ObservableObject`.
+No singletons are used; dependencies are injected through SwiftUI's `@StateObject` and `@ObservableObject`.
 
 ## Climate Projection Model
 
-The app uses simplified climate projection models to estimate 2045 weather:
+The app uses science-based synthesis methods:
 
-- **Baseline warming**: ~2.5°C increase by 2045 under current trajectory (with 0.8 regional variation factor)
-- **With interventions**: Includes cooling effects from Solar Radiation Management and other climate interventions (~1.2°C reduction)
-- **Regional variation**: Accounts for regional climate variation factors
-- **1.5°C Threshold**: Color-coded temperature displays reflect the Paris Agreement 1.5°C warming target
-  - Green: Below 1.5°C warming
-  - Yellow: 1.5°C - 2.0°C warming
-  - Orange: 2.0°C - 2.5°C warming
-  - Red: Above 2.5°C warming
+### Temperature
+- **Delta mapping**: Adds projected warming anomalies to current temperature
+- **Interventions**: 
+  - BAU scenario: ~2.5°C warming by 2045
+  - Mitigation scenario: ~1.8°C warming
+  - SRM (Solar Radiation Management): -0.3 to -1.0°C cooling
+  - CDR (Carbon Dioxide Removal): -0.1 to -0.3°C cooling
+- **Regional variation**: Polar amplification, latitude-based scaling
 
-### Climate Indicators
+### Humidity & Dew Point
+- Holds relative humidity constant
+- Recomputes dew point from synthesized temperature using Magnus formula
 
-The app projects multiple climate-related factors:
+### Precipitation
+- **Wet probability**: Adjusts based on anomaly data
+- **Intensity**: Scales by Clausius-Clapeyron relation (~7% per °C)
+- **Interventions**: Reduces intensity with SRM cooling
 
-- **Humidity**: Increases with temperature (~2.5% per °C)
-- **Wind Speed**: Intensifies with warming (~15% per °C)
-- **Precipitation**: More intense events with warming (~20% per °C)
-- **Weather Conditions**: Patterns intensify above 1.5°C threshold
+### Wind & Clouds
+- Kept unchanged in v1 (labeled as "low confidence")
 
-*Note: These are simplified estimates for demonstration purposes. Actual climate science involves much more complex models.*
+### Impact Metrics
+
+The app calculates 6 types of climate impacts:
+
+1. **Heat Index**: Combines temperature and humidity using Steadman's formula
+2. **Cloudburst Index**: (1 + ΔP_intensity) × (1 + 0.07·ΔT) - Clausius-Clapeyron proxy
+3. **Dry Spell Risk**: Estimates PET change from temperature (Thornthwaite approximation)
+4. **Ozone Risk**: Sigmoid function of (T_max - 90°F) × sunny hours
+5. **Vector Season**: Mosquito degree-days (days above 18°C threshold)
+6. **Allergy Season**: Frost-free period extension (~14 days per °C)
+
+*Note: These are simplified proxies for demonstration. Actual climate science involves more complex models.*
+
+## Data Sources
+
+- **Live Weather**: OpenWeatherMap Current Weather API
+- **Climate Anomalies**: 
+  - Bundled JSON with monthly anomalies per 1° grid cell (BAU and Mitigation scenarios)
+  - Parametric fallback model with latitude/seasonal scaling when static data unavailable
+  - Size: ~2-5 MB (coarse grid, monthly resolution)
+
+## Privacy
+
+- All climate calculations happen on your device
+- Your location is never sent to our servers
+- Only weather data API calls go to OpenWeatherMap
+- No personal data is collected or stored
 
 ## Testing
 
@@ -74,6 +113,11 @@ Run tests in Xcode:
 ```bash
 ⌘U or Product → Test
 ```
+
+Test coverage includes:
+- SynthesisEngine (temperature, humidity, precipitation synthesis)
+- ImpactCalculators (all 6 impact metrics)
+- AnomalyProvider (data loading, fallback, caching)
 
 ## Deployment
 
