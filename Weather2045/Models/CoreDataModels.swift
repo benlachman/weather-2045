@@ -59,14 +59,14 @@ enum Scenario: String, Codable {
 
 /// Intervention basket configuration
 struct InterventionBasket {
-    let srmCoolingC: Double  // Solar Radiation Management cooling (°C)
-    let cdrCoolingC: Double  // Carbon Dioxide Removal cooling (°C)
+    let srmCoolingC: Double  // Solar Radiation Management cooling (negative = cooling)
+    let cdrCoolingC: Double  // Carbon Dioxide Removal cooling (negative = cooling)
     
     /// Preset configurations
     static let none = InterventionBasket(srmCoolingC: 0.0, cdrCoolingC: 0.0)
-    static let low = InterventionBasket(srmCoolingC: 0.3, cdrCoolingC: 0.1)
-    static let medium = InterventionBasket(srmCoolingC: 0.6, cdrCoolingC: 0.2)
-    static let high = InterventionBasket(srmCoolingC: 1.0, cdrCoolingC: 0.3)
+    static let low = InterventionBasket(srmCoolingC: -0.3, cdrCoolingC: -0.1)
+    static let medium = InterventionBasket(srmCoolingC: -0.6, cdrCoolingC: -0.2)
+    static let high = InterventionBasket(srmCoolingC: -1.0, cdrCoolingC: -0.3)
 }
 
 /// Grid cell identifier for anomaly lookup

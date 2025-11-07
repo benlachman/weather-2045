@@ -24,7 +24,7 @@ final class SynthesisEngineTests: XCTestCase {
         // Given
         let observed = 20.0  // °C
         let anomaly = 2.5    // °C
-        let basket = InterventionBasket.medium  // SRM: 0.6, CDR: 0.2
+        let basket = InterventionBasket.medium  // SRM: -0.6, CDR: -0.2
         
         // When
         let synthesized = SynthesisEngine.synthesizeTemperature(
@@ -34,12 +34,8 @@ final class SynthesisEngineTests: XCTestCase {
         )
         
         // Then
-        // 20 + 2.5 + 0.6 + 0.2 = 23.3 (wait, should be 20 + 2.5 - 0.6 - 0.2)
-        // Actually interventions cool, so: 20 + 2.5 + 0.6 + 0.2 = 23.3
-        // Let me check the formula...interventionBasket has positive values but they represent cooling
-        // So the formula adds them: observed + anomaly + srm + cdr
-        // But logically cooling should subtract. Let me check the SynthesisEngine code...
-        XCTAssertEqual(synthesized, 23.3, accuracy: 0.01)
+        // 20 + 2.5 + (-0.6) + (-0.2) = 21.7
+        XCTAssertEqual(synthesized, 21.7, accuracy: 0.01)
     }
     
     func testSynthesizeDewPoint() {

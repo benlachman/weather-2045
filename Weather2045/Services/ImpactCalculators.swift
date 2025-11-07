@@ -3,6 +3,11 @@ import Foundation
 /// Calculators for climate impact metrics
 struct ImpactCalculators {
     
+    // MARK: - Constants
+    
+    private static let dailyTempRangeEstimate: Double = 5.0  // °C, typical diurnal range
+    private static let tempToSeasonExtensionMonths: Double = 2.0  // months per °C
+    
     // MARK: - Heat Index / Thermal Comfort
     
     /// Calculate heat index (feels-like temperature) using Steadman's formula
@@ -52,6 +57,11 @@ struct ImpactCalculators {
     /// Check for tropical night risk (minimum temp > 75°F / 24°C)
     static func hasTropicalNightRisk(minTempC: Double) -> Bool {
         return minTempC > 24.0
+    }
+    
+    /// Estimate minimum temperature from mean temperature
+    private static func estimateMinTemp(meanTempC: Double) -> Double {
+        return meanTempC - dailyTempRangeEstimate
     }
     
     // MARK: - Cloudburst / Flash Flood
@@ -151,7 +161,7 @@ struct ImpactCalculators {
         
         // Rough annual estimate: multiply by months in season
         // Assume current season is ~6 months, extend by temp delta
-        let seasonExtensionMonths = Int(tempDeltaC / 2.0)  // ~1 month per 2°C
+        let seasonExtensionMonths = Int(tempDeltaC / tempToSeasonExtensionMonths)
         return seasonExtensionMonths * 30
     }
     
@@ -175,7 +185,8 @@ struct ImpactCalculators {
         synthesized: SynthesizedWeather
     ) -> ImpactCard {
         let delta = heatIndexDelta(observed: observed, synthesized: synthesized)
-        let tropicalNightRisk = hasTropicalNightRisk(minTempC: synthesized.tempC - 5.0)
+        let minTemp = estimateMinTemp(meanTempC: synthesized.tempC)
+        let tropicalNightRisk = hasTropicalNightRisk(minTempC: minTemp)
         
         let value = String(format: "Feels +%.1f°C", delta)
         let description: String
