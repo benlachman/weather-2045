@@ -315,7 +315,7 @@
 				DEVELOPMENT_TEAM = GYV9U8338K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Weather 2045 needs your location to provide accurate weather forecasts.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Weather 2045 needs your location to provide accurate weather forecasts for the year 2045.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -345,7 +345,7 @@
 				DEVELOPMENT_TEAM = GYV9U8338K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Weather 2045 needs your location to provide accurate weather forecasts.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Weather 2045 needs your location to provide accurate weather forecasts for the year 2045.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
