@@ -36,25 +36,30 @@ struct ContentView: View {
                     ScrollView {
                         VStack(spacing: 25) {
                             // Date Header
-                            VStack(spacing: 5) {
+                            VStack(spacing: 8) {
                                 HStack {
-                                    Text("Today, \(weather.todayDate2045)")
-                                        .font(.title2)
-                                        .fontWeight(.semibold)
+                                    Text("Today")
+                                        .font(.largeTitle)
+                                        .fontWeight(.bold)
                                         .foregroundStyle(.primary)
-                                    
+
                                     Spacer()
-                                    
+
                                     Button(action: { showMapPicker = true }) {
                                         Image(systemName: "map")
                                             .font(.title3)
                                             .foregroundStyle(.primary)
                                     }
                                 }
-                                
-                                Text(weather.locationName)
+
+                                Text(weather.todayDate2045)
                                     .font(.title3)
                                     .foregroundStyle(.primary.opacity(0.9))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                                Text(weather.locationName)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.primary.opacity(0.7))
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .padding(.top, 20)
@@ -76,7 +81,8 @@ struct ContentView: View {
                         }
                         .padding()
                     }
-                    
+                    .scrollContentBackground(.hidden)
+
                     // Floating Toggle at Bottom - full width, no bottom padding
                     InterventionToggle(isEnabled: $viewModel.withInterventions)
                 }
@@ -480,45 +486,39 @@ struct ForecastView: View {
 
 struct InterventionToggle: View {
     @Binding var isEnabled: Bool
-    
+
     var body: some View {
         VStack(spacing: 12) {
             Text("Climate Interventions")
                 .font(.title3)
                 .fontWeight(.semibold)
                 .foregroundStyle(.primary)
-            
+
             HStack(spacing: 15) {
                 Text("Without")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                
+
                 Toggle("", isOn: $isEnabled)
                     .labelsHidden()
                     .tint(.green)
                     .scaleEffect(1.3)
-                
+
                 Text("With")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-            
+
             Text(isEnabled ? "Includes Solar Radiation Management & other interventions" : "Baseline scenario")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
         .padding(.horizontal, 20)
-        .padding(.top, 20)
-        .padding(.bottom, 20)
+        .padding(.top, 10)
         .frame(maxWidth: .infinity)
-        .background {
-            if #available(iOS 18.0, *) {
-                .thinMaterial
-            } else {
-                .ultraThinMaterial
-            }
-        }
+        .background(.clear)
+        .background(.ultraThinMaterial)
         .ignoresSafeArea(edges: .bottom)
     }
 }
@@ -530,13 +530,24 @@ struct MapLocationPicker: View {
         center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
         span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10)
     )
-    
+    @State private var cameraPosition: MapCameraPosition = .region(
+        MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+            span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10)
+        )
+    )
+
     let onLocationSelected: (CLLocationCoordinate2D) -> Void
-    
+
     var body: some View {
         NavigationStack {
             ZStack {
-                Map(coordinateRegion: $region, interactionModes: .all, showsUserLocation: true)
+                Map(position: $cameraPosition) {
+                    UserAnnotation()
+                }
+                .onMapCameraChange { context in
+                    region = context.region
+                }
                 
                 // Center reticle indicator
                 Image(systemName: "scope")
@@ -557,13 +568,7 @@ struct MapLocationPicker: View {
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
                     }
-                    .background {
-                        if #available(iOS 18.0, *) {
-                            .thinMaterial
-                        } else {
-                            .ultraThinMaterial
-                        }
-                    }
+                    .background(.ultraThinMaterial)
                     .ignoresSafeArea(edges: .bottom)
                 }
             }
@@ -579,7 +584,12 @@ struct MapLocationPicker: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
                         if let location = locationManager.location {
-                            region.center = location.coordinate
+                            let newRegion = MKCoordinateRegion(
+                                center: location.coordinate,
+                                span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10)
+                            )
+                            region = newRegion
+                            cameraPosition = .region(newRegion)
                         }
                     }) {
                         Image(systemName: "location.fill")

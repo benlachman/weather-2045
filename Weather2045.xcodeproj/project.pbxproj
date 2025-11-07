@@ -16,10 +16,10 @@
 		A0000013000000010000001 /* WeatherModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000014000000010000001 /* WeatherModels.swift */; };
 		A0000015000000010000001 /* ClimateProjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000016000000010000001 /* ClimateProjection.swift */; };
 		A0000017000000010000001 /* WeatherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000018000000010000001 /* WeatherViewModel.swift */; };
+		B5D1374D2EBD425100414106 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D1374C2EBD425100414106 /* Config.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A0000019000000010000001 /* Weather2045.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Weather2045.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0000002000000010000001 /* Weather2045App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather2045App.swift; sourceTree = "<group>"; };
 		A0000004000000010000001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A0000006000000010000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -29,6 +29,8 @@
 		A0000014000000010000001 /* WeatherModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherModels.swift; sourceTree = "<group>"; };
 		A0000016000000010000001 /* ClimateProjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimateProjection.swift; sourceTree = "<group>"; };
 		A0000018000000010000001 /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
+		A0000019000000010000001 /* Weather2045.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Weather2045.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B5D1374C2EBD425100414106 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +62,7 @@
 				A0000025000000010000001 /* Services */,
 				A0000006000000010000001 /* Assets.xcassets */,
 				A0000026000000010000001 /* Preview Content */,
+				B5D1374C2EBD425100414106 /* Config.swift */,
 			);
 			path = Weather2045;
 			sourceTree = "<group>";
@@ -173,6 +176,7 @@
 				A0000003000000010000001 /* ContentView.swift in Sources */,
 				A0000017000000010000001 /* WeatherViewModel.swift in Sources */,
 				A0000011000000010000001 /* WeatherService.swift in Sources */,
+				B5D1374D2EBD425100414106 /* Config.swift in Sources */,
 				A0000009000000010000001 /* LocationManager.swift in Sources */,
 				A0000001000000010000001 /* Weather2045App.swift in Sources */,
 			);
@@ -308,6 +312,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Weather2045/Preview Content\"";
+				DEVELOPMENT_TEAM = GYV9U8338K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Weather 2045 needs your location to provide accurate weather forecasts.";
@@ -321,7 +326,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.weather2045.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nicemohawk.weather2045;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -337,6 +342,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Weather2045/Preview Content\"";
+				DEVELOPMENT_TEAM = GYV9U8338K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Weather 2045 needs your location to provide accurate weather forecasts.";
@@ -350,7 +356,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.weather2045.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nicemohawk.weather2045;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
