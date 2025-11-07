@@ -132,7 +132,7 @@ struct Weather2045Data {
     
     var todayDate2045: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE, MMMM d"
+        formatter.dateFormat = "EEEE, MMMM d, yyyy"
         let now = Date()
         let calendar = Calendar.current
         // Project to 2045 - same month/day, year 2045

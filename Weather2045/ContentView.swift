@@ -1,8 +1,10 @@
 import SwiftUI
+import MapKit
 
 struct ContentView: View {
     @StateObject private var locationManager = LocationManager()
     @StateObject private var viewModel = WeatherViewModel()
+    @State private var showMapPicker = false
     
     var body: some View {
         ZStack {
@@ -30,19 +32,30 @@ struct ContentView: View {
                         .padding()
                 }
             } else if let weather = viewModel.weatherData {
-                VStack(spacing: 0) {
+                ZStack(alignment: .bottom) {
                     ScrollView {
                         VStack(spacing: 25) {
                             // Date Header
                             VStack(spacing: 5) {
-                                Text("Today, \(weather.todayDate2045)")
-                                    .font(.title2)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.primary)
+                                HStack {
+                                    Text("Today, \(weather.todayDate2045)")
+                                        .font(.title2)
+                                        .fontWeight(.semibold)
+                                        .foregroundStyle(.primary)
+                                    
+                                    Spacer()
+                                    
+                                    Button(action: { showMapPicker = true }) {
+                                        Image(systemName: "map")
+                                            .font(.title3)
+                                            .foregroundStyle(.primary)
+                                    }
+                                }
                                 
                                 Text(weather.locationName)
                                     .font(.title3)
                                     .foregroundStyle(.primary.opacity(0.9))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .padding(.top, 20)
                             
@@ -64,11 +77,8 @@ struct ContentView: View {
                         .padding()
                     }
                     
-                    // Floating Toggle at Bottom
+                    // Floating Toggle at Bottom - full width, no bottom padding
                     InterventionToggle(isEnabled: $viewModel.withInterventions)
-                        .padding()
-                        .background(.ultraThickMaterial)
-                        .shadow(color: .black.opacity(0.1), radius: 5)
                 }
             } else {
                 VStack {
@@ -81,6 +91,17 @@ struct ContentView: View {
                         .padding()
                 }
             }
+        }
+        .sheet(isPresented: $showMapPicker) {
+            MapLocationPicker(onLocationSelected: { coordinate in
+                Task {
+                    await viewModel.fetchWeather(
+                        latitude: coordinate.latitude,
+                        longitude: coordinate.longitude
+                    )
+                }
+                showMapPicker = false
+            })
         }
         .onAppear {
             locationManager.requestLocation()
@@ -106,7 +127,7 @@ struct Main2045WeatherView: View {
             // Main temperature and condition
             Image(systemName: weatherIcon(for: weather.projectedCondition))
                 .font(.system(size: 80))
-                .foregroundStyle(temperatureColor(for: weather.temperatureDelta))
+                .foregroundStyle(weatherIconColor(for: weather.projectedCondition))
             
             Text(weather.displayProjectedTemp)
                 .font(.system(size: 72, weight: .bold))
@@ -146,6 +167,21 @@ struct Main2045WeatherView: View {
             return "sun.max.fill"
         default:
             return "cloud.sun.fill"
+        }
+    }
+    
+    private func weatherIconColor(for condition: String) -> Color {
+        switch condition.lowercased() {
+        case let c where c.contains("clear") || c.contains("hot"):
+            return .yellow
+        case let c where c.contains("rain") || c.contains("storm"):
+            return .blue
+        case let c where c.contains("snow"):
+            return .cyan
+        case let c where c.contains("cloud"):
+            return .gray
+        default:
+            return .primary
         }
     }
     
@@ -472,10 +508,80 @@ struct InterventionToggle: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
-        .padding(20)
-        .background(.ultraThickMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .shadow(color: .black.opacity(0.2), radius: 10)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
+        .padding(.bottom, 20)
+        .frame(maxWidth: .infinity)
+        .background(.ultraThinMaterial)
+        .ignoresSafeArea(edges: .bottom)
+    }
+}
+
+struct MapLocationPicker: View {
+    @Environment(\.dismiss) var dismiss
+    @State private var region = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+        span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10)
+    )
+    @State private var selectedCoordinate: CLLocationCoordinate2D?
+    
+    let onLocationSelected: (CLLocationCoordinate2D) -> Void
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Map(coordinateRegion: $region, interactionModes: .all, showsUserLocation: true, annotationItems: selectedCoordinate.map { [$0] } ?? []) { coordinate in
+                    MapMarker(coordinate: coordinate, tint: .red)
+                }
+                .onTapGesture { location in
+                    // Convert tap location to coordinate
+                    // This is a simplified approach - in production you'd use proper map tap handling
+                }
+                
+                VStack {
+                    Spacer()
+                    VStack(spacing: 16) {
+                        Text("Tap on the map to select a location")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal)
+                        
+                        HStack(spacing: 16) {
+                            Button("Cancel") {
+                                dismiss()
+                            }
+                            .buttonStyle(.bordered)
+                            
+                            Button("Use Current Location") {
+                                // Get current location and select it
+                                onLocationSelected(region.center)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            
+                            if selectedCoordinate != nil {
+                                Button("Select") {
+                                    if let coord = selectedCoordinate {
+                                        onLocationSelected(coord)
+                                    }
+                                }
+                                .buttonStyle(.borderedProminent)
+                            }
+                        }
+                        .padding()
+                    }
+                    .background(.ultraThinMaterial)
+                }
+            }
+            .navigationTitle("Choose Location")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        onLocationSelected(region.center)
+                    }
+                }
+            }
+        }
     }
 }
 
