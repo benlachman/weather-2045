@@ -523,25 +523,24 @@ struct MapLocationPicker: View {
         center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
         span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10)
     )
-    @State private var selectedCoordinate: CLLocationCoordinate2D?
     
     let onLocationSelected: (CLLocationCoordinate2D) -> Void
     
     var body: some View {
         NavigationStack {
             ZStack {
-                Map(coordinateRegion: $region, interactionModes: .all, showsUserLocation: true, annotationItems: selectedCoordinate.map { [$0] } ?? []) { coordinate in
-                    MapMarker(coordinate: coordinate, tint: .red)
-                }
-                .onTapGesture { location in
-                    // Convert tap location to coordinate
-                    // This is a simplified approach - in production you'd use proper map tap handling
-                }
+                Map(coordinateRegion: $region, interactionModes: .all, showsUserLocation: true)
+                
+                // Center pin indicator
+                Image(systemName: "mappin.circle.fill")
+                    .font(.system(size: 40))
+                    .foregroundStyle(.red)
+                    .shadow(radius: 3)
                 
                 VStack {
                     Spacer()
                     VStack(spacing: 16) {
-                        Text("Tap on the map to select a location")
+                        Text("Center the map on your desired location")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .padding(.horizontal)
@@ -552,20 +551,10 @@ struct MapLocationPicker: View {
                             }
                             .buttonStyle(.bordered)
                             
-                            Button("Use Current Location") {
-                                // Get current location and select it
+                            Button("Select Location") {
                                 onLocationSelected(region.center)
                             }
                             .buttonStyle(.borderedProminent)
-                            
-                            if selectedCoordinate != nil {
-                                Button("Select") {
-                                    if let coord = selectedCoordinate {
-                                        onLocationSelected(coord)
-                                    }
-                                }
-                                .buttonStyle(.borderedProminent)
-                            }
                         }
                         .padding()
                     }
@@ -574,13 +563,6 @@ struct MapLocationPicker: View {
             }
             .navigationTitle("Choose Location")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        onLocationSelected(region.center)
-                    }
-                }
-            }
         }
     }
 }
