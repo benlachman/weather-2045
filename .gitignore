@@ -65,5 +65,5 @@ fastlane/screenshots/**/*.png
 fastlane/test_output
 
 # API Keys and Secrets
-# Prevent committing actual API keys
-Weather2045/Config.swift
+# Config.swift is now committed with placeholder - real keys injected via CI
+# Developers should add their own key locally (changes won't be committed)
