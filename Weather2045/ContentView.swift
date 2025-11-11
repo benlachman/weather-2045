@@ -3,8 +3,9 @@ import MapKit
 
 struct ContentView: View {
     @StateObject private var locationManager = LocationManager()
-    @StateObject private var viewModel = WeatherViewModel()
+    @StateObject private var appState = AppState()
     @State private var showMapPicker = false
+    @State private var showMethodsSheet = false
     
     var body: some View {
         ZStack {
@@ -15,10 +16,10 @@ struct ContentView: View {
             )
             .ignoresSafeArea()
             
-            if viewModel.isLoading {
+            if appState.isLoading {
                 ProgressView("Loading weather...")
                     .foregroundStyle(.white)
-            } else if let error = viewModel.errorMessage {
+            } else if let error = appState.errorMessage {
                 VStack {
                     Image(systemName: "exclamationmark.triangle")
                         .font(.system(size: 50))
@@ -31,7 +32,8 @@ struct ContentView: View {
                         .multilineTextAlignment(.center)
                         .padding()
                 }
-            } else if let weather = viewModel.weatherData {
+            } else if let observed = appState.observedWeather,
+                      let synthesized = appState.synthesizedWeather {
                 ZStack(alignment: .bottom) {
                     ScrollView {
                         VStack(spacing: 25) {
@@ -52,29 +54,36 @@ struct ContentView: View {
                                     }
                                 }
 
-                                Text(weather.todayDate2045)
+                                Text(todayDate2045)
                                     .font(.title3)
                                     .foregroundStyle(.primary.opacity(0.9))
                                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                                Text(weather.locationName)
+                                Text(appState.locationName)
                                     .font(.subheadline)
                                     .foregroundStyle(.primary.opacity(0.7))
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .padding(.top, 20)
                             
-                            // Main 2045 Weather Display
-                            Main2045WeatherView(weather: weather)
+                            // Primary Weather Comparison
+                            WeatherComparisonView(observed: observed, synthesized: synthesized)
                             
-                            // Today's Forecast
-                            ForecastView(forecast: weather.forecast, title: "Today's Forecast")
-                            
-                            // Additional Climate Factors
-                            AdditionalClimateFactorsView(weather: weather)
+                            // Impact Cards (2-4 cards)
+                            if !appState.impactCards.isEmpty {
+                                ImpactCardsView(cards: appState.impactCards)
+                            }
                             
                             // Methodology Section
-                            MethodologyView(weather: weather)
+                            Button(action: { showMethodsSheet = true }) {
+                                HStack {
+                                    Image(systemName: "info.circle")
+                                    Text("How we estimate this")
+                                        .font(.subheadline)
+                                }
+                                .foregroundStyle(.primary.opacity(0.7))
+                            }
+                            .padding()
                             
                             // Spacer for floating toggle
                             Spacer(minLength: 120)
@@ -83,8 +92,8 @@ struct ContentView: View {
                     }
                     .scrollContentBackground(.hidden)
 
-                    // Floating Toggle at Bottom - full width, no bottom padding
-                    InterventionToggle(isEnabled: $viewModel.withInterventions)
+                    // Floating Toggle at Bottom
+                    InterventionToggle(isEnabled: $appState.withInterventions)
                 }
             } else {
                 VStack {
@@ -101,7 +110,7 @@ struct ContentView: View {
         .sheet(isPresented: $showMapPicker) {
             MapLocationPicker(onLocationSelected: { coordinate in
                 Task {
-                    await viewModel.fetchWeather(
+                    await appState.fetchWeather(
                         latitude: coordinate.latitude,
                         longitude: coordinate.longitude
                     )
@@ -109,13 +118,16 @@ struct ContentView: View {
                 showMapPicker = false
             })
         }
+        .sheet(isPresented: $showMethodsSheet) {
+            MethodsSheetView()
+        }
         .onAppear {
             locationManager.requestLocation()
         }
         .onChange(of: locationManager.location) { _, newLocation in
             if let location = newLocation {
                 Task {
-                    await viewModel.fetchWeather(
+                    await appState.fetchWeather(
                         latitude: location.coordinate.latitude,
                         longitude: location.coordinate.longitude
                     )
@@ -123,84 +135,27 @@ struct ContentView: View {
             }
         }
     }
-}
+    
+    private var todayDate2045: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, MMMM d, yyyy"
+        let calendar = Calendar.current
+        let now = Date()
 
-struct Main2045WeatherView: View {
-    let weather: Weather2045Data
-    
-    var body: some View {
-        VStack(spacing: 20) {
-            // Main temperature and condition
-            Image(systemName: weatherIcon(for: weather.projectedCondition))
-                .font(.system(size: 80))
-                .foregroundStyle(weatherIconColor(for: weather.projectedCondition))
-            
-            Text(weather.displayProjectedTemp)
-                .font(.system(size: 72, weight: .bold))
-                .foregroundStyle(temperatureColor(for: weather.temperatureDelta))
-            
-            Text(weather.projectedCondition)
-                .font(.title2)
-                .foregroundStyle(.primary)
-            
-            // Climate indicators row
-            HStack(spacing: 15) {
-                QuickIndicator(icon: "humidity.fill", value: weather.displayProjectedHumidity)
-                QuickIndicator(icon: "wind", value: weather.displayProjectedWindSpeed)
-                if weather.projectedPrecipitation > 0 {
-                    QuickIndicator(icon: "cloud.rain.fill", value: weather.displayProjectedPrecipitation)
-                }
-            }
-            .padding()
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 15))
+        // Get current month and day
+        let components = calendar.dateComponents([.month, .day], from: now)
+
+        // Create date components for 2045 with same month/day
+        var newComponents = DateComponents()
+        newComponents.year = 2045
+        newComponents.month = components.month
+        newComponents.day = components.day
+
+        // Create the date
+        if let year2045 = calendar.date(from: newComponents) {
+            return formatter.string(from: year2045)
         }
-    }
-    
-    private func weatherIcon(for condition: String) -> String {
-        switch condition.lowercased() {
-        case let c where c.contains("clear"):
-            return "sun.max.fill"
-        case let c where c.contains("cloud"):
-            return "cloud.fill"
-        case let c where c.contains("rain"):
-            return "cloud.rain.fill"
-        case let c where c.contains("storm"):
-            return "cloud.bolt.rain.fill"
-        case let c where c.contains("snow"):
-            return "cloud.snow.fill"
-        case let c where c.contains("hot"):
-            return "sun.max.fill"
-        default:
-            return "cloud.sun.fill"
-        }
-    }
-    
-    private func weatherIconColor(for condition: String) -> Color {
-        switch condition.lowercased() {
-        case let c where c.contains("clear") || c.contains("hot"):
-            return .yellow
-        case let c where c.contains("rain") || c.contains("storm"):
-            return .blue
-        case let c where c.contains("snow"):
-            return .cyan
-        case let c where c.contains("cloud"):
-            return .gray
-        default:
-            return .primary
-        }
-    }
-    
-    private func temperatureColor(for delta: Double) -> Color {
-        if delta < 1.5 {
-            return .green
-        } else if delta < 2.0 {
-            return .yellow
-        } else if delta < 2.5 {
-            return .orange
-        } else {
-            return .red
-        }
+        return "2045"
     }
 }
 
@@ -218,269 +173,6 @@ struct QuickIndicator: View {
                 .fontWeight(.semibold)
                 .foregroundStyle(.primary)
         }
-    }
-}
-
-struct AdditionalClimateFactorsView: View {
-    let weather: Weather2045Data
-    
-    var body: some View {
-        VStack(spacing: 15) {
-            Text("Climate Impact Factors")
-                .font(.headline)
-                .foregroundStyle(.primary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            VStack(spacing: 12) {
-                ClimateFactorRow(
-                    icon: "drop.fill",
-                    label: "Water Availability",
-                    value: "\(weather.waterAvailability)%",
-                    valueColor: waterAvailabilityColor(weather.waterAvailability)
-                )
-                
-                ClimateFactorRow(
-                    icon: "leaf.fill",
-                    label: "Agriculture",
-                    value: weather.agricultureImpact,
-                    valueColor: .primary
-                )
-                
-                ClimateFactorRow(
-                    icon: "exclamationmark.triangle.fill",
-                    label: "Disaster Risk",
-                    value: weather.disasterRisk,
-                    valueColor: disasterRiskColor(weather.disasterRisk)
-                )
-            }
-        }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 15))
-    }
-    
-    private func waterAvailabilityColor(_ value: Int) -> Color {
-        if value >= 75 {
-            return .green
-        } else if value >= 50 {
-            return .yellow
-        } else if value >= 35 {
-            return .orange
-        } else {
-            return .red
-        }
-    }
-    
-    private func disasterRiskColor(_ risk: String) -> Color {
-        switch risk {
-        case "Low":
-            return .green
-        case "Moderate":
-            return .yellow
-        case "High":
-            return .orange
-        case "Severe":
-            return .red
-        default:
-            return .primary
-        }
-    }
-}
-
-struct ClimateFactorRow: View {
-    let icon: String
-    let label: String
-    let value: String
-    let valueColor: Color
-    
-    var body: some View {
-        HStack {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundStyle(.primary)
-                .frame(width: 30)
-            
-            Text(label)
-                .font(.subheadline)
-                .foregroundStyle(.primary)
-            
-            Spacer()
-            
-            Text(value)
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .foregroundStyle(valueColor)
-        }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 12)
-        .background(Color.white.opacity(0.1))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-    }
-}
-
-struct MethodologyView: View {
-    let weather: Weather2045Data
-    
-    var body: some View {
-        VStack(spacing: 15) {
-            Text("Methodology & Changes from Today")
-                .font(.headline)
-                .foregroundStyle(.primary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            VStack(spacing: 12) {
-                ChangeRow(label: "Temperature", from: weather.displayCurrentTemp, to: weather.displayProjectedTemp, delta: weather.displayDelta)
-                ChangeRow(label: "Humidity", from: weather.displayHumidity, to: weather.displayProjectedHumidity, delta: weather.displayHumidityDelta)
-                ChangeRow(label: "Wind Speed", from: weather.displayWindSpeed, to: weather.displayProjectedWindSpeed, delta: weather.displayWindSpeedDelta)
-            }
-            
-            Divider()
-                .background(Color.white.opacity(0.3))
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Climate Interventions Modeled:")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.primary)
-                
-                if weather.withInterventions {
-                    InterventionItem(name: "Solar Radiation Management", impact: "-1.2°C")
-                    InterventionItem(name: "Carbon Capture & Storage", impact: "Reduced CO₂")
-                    InterventionItem(name: "Renewable Energy Transition", impact: "Lower emissions")
-                    InterventionItem(name: "Reforestation Programs", impact: "Carbon sink")
-                } else {
-                    Text("No interventions included (business as usual)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .italic()
-                }
-            }
-            
-            Divider()
-                .background(Color.white.opacity(0.3))
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Model Parameters:")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.primary)
-                
-                ModelParameter(name: "Baseline warming", value: "2.5°C by 2045")
-                ModelParameter(name: "Regional variation", value: "0.8 factor")
-                ModelParameter(name: "Humidity increase", value: "~2.5% per °C")
-                ModelParameter(name: "Wind intensification", value: "~15% per °C")
-                ModelParameter(name: "Precipitation increase", value: "~20% per °C")
-            }
-        }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 15))
-    }
-}
-
-struct ChangeRow: View {
-    let label: String
-    let from: String
-    let to: String
-    let delta: String
-    
-    var body: some View {
-        HStack {
-            Text(label)
-                .font(.subheadline)
-                .foregroundStyle(.primary)
-                .frame(width: 100, alignment: .leading)
-            
-            HStack(spacing: 8) {
-                Text(from)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                
-                Image(systemName: "arrow.right")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                
-                Text(to)
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.primary)
-                
-                Text(delta)
-                    .font(.caption)
-                    .foregroundStyle(.orange)
-            }
-            
-            Spacer()
-        }
-        .padding(.vertical, 4)
-    }
-}
-
-struct InterventionItem: View {
-    let name: String
-    let impact: String
-    
-    var body: some View {
-        HStack {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.caption)
-                .foregroundStyle(.green)
-            
-            Text(name)
-                .font(.caption)
-                .foregroundStyle(.primary)
-            
-            Spacer()
-            
-            Text(impact)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-    }
-}
-
-struct ModelParameter: View {
-    let name: String
-    let value: String
-    
-    var body: some View {
-        HStack {
-            Text("•")
-                .foregroundStyle(.secondary)
-            Text(name + ":")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            Text(value)
-                .font(.caption)
-                .foregroundStyle(.primary)
-        }
-    }
-}
-
-struct ForecastView: View {
-    let forecast: String
-    let title: String
-    
-    var body: some View {
-        VStack(spacing: 10) {
-            HStack {
-                Image(systemName: "text.bubble.fill")
-                    .foregroundStyle(.primary)
-                Text(title)
-                    .font(.headline)
-                    .foregroundStyle(.primary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            Text(forecast)
-                .font(.subheadline)
-                .foregroundStyle(.primary)
-                .multilineTextAlignment(.leading)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 15))
     }
 }
 
@@ -605,4 +297,273 @@ struct MapLocationPicker: View {
 
 #Preview {
     ContentView()
+}
+
+// MARK: - Weather Comparison View
+
+struct WeatherComparisonView: View {
+    let observed: ObservedWeather
+    let synthesized: SynthesizedWeather
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            // Now vs 2045 Comparison
+            HStack(spacing: 30) {
+                // Now
+                VStack(spacing: 8) {
+                    Text("Now")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(String(format: "%.1f°C", observed.tempC))
+                        .font(.system(size: 36, weight: .bold))
+                        .foregroundStyle(.primary)
+                }
+                
+                Image(systemName: "arrow.right")
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+                
+                // 2045
+                VStack(spacing: 8) {
+                    Text("2045")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(String(format: "%.1f°C", synthesized.tempC))
+                        .font(.system(size: 36, weight: .bold))
+                        .foregroundStyle(temperatureColor(for: synthesized.tempC - observed.tempC))
+                }
+            }
+            
+            // Heat Index Delta
+            let hiDelta = ImpactCalculators.heatIndexDelta(observed: observed, synthesized: synthesized)
+            Text(String(format: "Feels +%.1f°C warmer", hiDelta))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            
+            // Quick indicators
+            HStack(spacing: 15) {
+                QuickIndicator(
+                    icon: "humidity.fill",
+                    value: String(format: "%.0f%%", synthesized.relativeHumidity * 100)
+                )
+                QuickIndicator(
+                    icon: "wind",
+                    value: String(format: "%.1f m/s", synthesized.windSpeedMS)
+                )
+                if synthesized.precipMM > 0 {
+                    QuickIndicator(
+                        icon: "cloud.rain.fill",
+                        value: String(format: "%.1f mm", synthesized.precipMM)
+                    )
+                }
+            }
+            .padding()
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 15))
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 15))
+    }
+    
+    private func temperatureColor(for delta: Double) -> Color {
+        if delta < 1.5 { return .green }
+        if delta < 2.0 { return .yellow }
+        if delta < 2.5 { return .orange }
+        return .red
+    }
+}
+
+// MARK: - Impact Cards View
+
+struct ImpactCardsView: View {
+    let cards: [ImpactCard]
+    
+    var body: some View {
+        VStack(spacing: 15) {
+            Text("Climate Impacts")
+                .font(.headline)
+                .foregroundStyle(.primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            ForEach(Array(cards.enumerated()), id: \.offset) { index, card in
+                ImpactCardItemView(card: card)
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 15))
+    }
+}
+
+struct ImpactCardItemView: View {
+    let card: ImpactCard
+    @State private var showInfo = false
+    
+    var body: some View {
+        HStack {
+            Image(systemName: card.type.icon)
+                .font(.title2)
+                .foregroundStyle(severityColor(card.severity))
+                .frame(width: 40)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(card.type.rawValue)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.primary)
+                
+                Text(card.description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            
+            Spacer()
+            
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(card.value)
+                    .font(.headline)
+                    .foregroundStyle(severityColor(card.severity))
+                
+                Button(action: { showInfo.toggle() }) {
+                    Image(systemName: "info.circle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .padding()
+        .background(Color.white.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .alert(card.type.rawValue, isPresented: $showInfo) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(impactExplanation(for: card.type))
+        }
+    }
+    
+    private func severityColor(_ severity: Severity) -> Color {
+        switch severity {
+        case .low: return .green
+        case .moderate: return .yellow
+        case .high: return .red
+        }
+    }
+    
+    private func impactExplanation(for type: ImpactType) -> String {
+        switch type {
+        case .thermalComfort:
+            return "Heat index combines temperature and humidity to show how hot it really feels. Higher temperatures and humidity make it harder for your body to cool down."
+        case .cloudburst:
+            return "Warmer air holds more moisture. For every 1°C warming, the atmosphere can hold ~7% more water, leading to more intense rainfall events."
+        case .drySpell:
+            return "Higher temperatures increase evaporation, potentially leading to more frequent and longer dry periods between rain events."
+        case .airQuality:
+            return "Ground-level ozone forms when heat and sunlight react with pollutants. Hotter days mean more ozone, affecting air quality."
+        case .vectorSeason:
+            return "Mosquitoes and other disease vectors thrive in warm conditions. Warmer temperatures extend the season when they're active."
+        case .allergySeason:
+            return "Warmer temperatures extend the frost-free period, allowing plants to produce pollen for a longer season."
+        }
+    }
+}
+
+// MARK: - Methods Sheet
+
+struct MethodsSheetView: View {
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Section {
+                        Text("Weather 2045 synthesizes future climate conditions based on today's weather and climate science projections.")
+                            .font(.body)
+                    }
+                    
+                    Section {
+                        Text("Methodology")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        
+                        VStack(alignment: .leading, spacing: 12) {
+                            MethodItem(
+                                title: "Temperature",
+                                description: "Uses delta mapping: adds projected warming to current temperature based on climate models and regional factors."
+                            )
+                            
+                            MethodItem(
+                                title: "Humidity",
+                                description: "Holds relative humidity constant while adjusting dew point for warmer temperatures using the Magnus formula."
+                            )
+                            
+                            MethodItem(
+                                title: "Precipitation",
+                                description: "Adjusts both probability and intensity based on Clausius-Clapeyron relation (~7% increase per °C)."
+                            )
+                            
+                            MethodItem(
+                                title: "Interventions",
+                                description: "Compares business-as-usual (BAU) with mitigation scenarios including Solar Radiation Management (SRM) and Carbon Dioxide Removal (CDR)."
+                            )
+                        }
+                    }
+                    
+                    Section {
+                        Text("Assumptions & Limits")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("• Projections use simplified climate models for demonstration")
+                            Text("• Regional data uses coarse grid (1° resolution)")
+                            Text("• Wind and cloud cover kept constant (low confidence)")
+                            Text("• Impact metrics are proxies, not precise predictions")
+                            Text("• City-specific factors use simplified heuristics")
+                        }
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    }
+                    
+                    Section {
+                        Text("Privacy")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        
+                        Text("All calculations happen on your device. Your location is never sent to our servers. Weather data comes from OpenWeatherMap API.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding()
+            }
+            .navigationTitle("Methods")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct MethodItem: View {
+    let title: String
+    let description: String
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+            Text(description)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 4)
+    }
 }
