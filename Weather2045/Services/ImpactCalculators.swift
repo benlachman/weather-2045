@@ -157,10 +157,9 @@ struct ImpactCalculators {
         futureAvgTempC: Double,
         tempDeltaC: Double
     ) -> Int {
-        let threshold = 18.0
-        
         // Rough annual estimate: multiply by months in season
         // Assume current season is ~6 months, extend by temp delta
+        // Mosquito activity threshold is ~18°C
         let seasonExtensionMonths = Int(tempDeltaC / tempToSeasonExtensionMonths)
         return seasonExtensionMonths * 30
     }
