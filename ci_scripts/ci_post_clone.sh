@@ -7,7 +7,9 @@ set -e
 
 echo "Generating Config.swift from environment variable..."
 
-CONFIG_FILE="${CI_WORKSPACE}/Weather2045/Config.swift"
+# Determine repository root (script is in ci_scripts/ subdirectory)
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+CONFIG_FILE="${REPO_ROOT}/Weather2045/Config.swift"
 
 if [ -z "$OPENWEATHERMAP_API_KEY" ]; then
     echo "Error: OPENWEATHERMAP_API_KEY environment variable is not set"
